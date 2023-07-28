@@ -1,8 +1,9 @@
 import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolkit';
-import appReducer from './app';
+
+import authReducer from './auth';
 
 export const rootReducer = combineReducers({
-  app: appReducer,
+  auth: authReducer,
 });
 
 export const store = configureStore({
