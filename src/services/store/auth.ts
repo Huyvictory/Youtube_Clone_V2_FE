@@ -3,7 +3,13 @@ import { createSlice } from '@reduxjs/toolkit';
 import { AUTH_TOKEN } from '@/constants';
 import { setLocalStorageKey } from '@/utils/localStorage';
 
-import { requestEmailVerification, signIn, signUp, verifyEmail } from '../api/auth';
+import {
+  requestEmailVerification,
+  resetNewPassword,
+  signIn,
+  signUp,
+  verifyEmail,
+} from '../api/auth';
 
 // Define a type for the slice state
 interface AppState {
@@ -62,6 +68,16 @@ export const appSlice = createSlice({
       })
       .addCase(requestEmailVerification.fulfilled, (state) => {
         state.isLoadingAuthForm = false;
+      })
+      .addCase(resetNewPassword.pending, (state) => {
+        state.isLoadingAuthForm = true;
+      })
+      .addCase(resetNewPassword.rejected, (state) => {
+        state.isLoadingAuthForm = false;
+      })
+      .addCase(resetNewPassword.fulfilled, (state, action) => {
+        state.isLoadingAuthForm = false;
+        setLocalStorageKey(AUTH_TOKEN.AUTH_TOKEN, action.payload.data.data.accessToken);
       });
   },
 });

@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import {
+  IUserAuthentication_Response,
   SignInPayload,
   SignInResponseType,
   SignUpPayload,
@@ -66,6 +67,64 @@ export const requestEmailVerification = createAsyncThunk(
       const resPromise: SignInResponseType = await axiosHelper.post(
         '/auth/verification/request',
         payload,
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const requestEmailResetPassword = createAsyncThunk(
+  '/auth/emailRequestResetPassword',
+  async (payload: {
+    email: string;
+  }): Promise<{ id: string; message: string; status: number }> => {
+    try {
+      const resPromise: { id: string; message: string; status: number } =
+        await axiosHelper.post('/auth/password/request-reset', payload);
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const validteResetPasswordCode = createAsyncThunk(
+  '/auth/validateResetPasswordCode',
+  async (payload: {
+    reset_password_code: string;
+    reset_password_token: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.put(
+        `/auth/password/check-reset-password-code/${payload.reset_password_token}`,
+        { reset_password_code: payload.reset_password_code },
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const resetNewPassword = createAsyncThunk(
+  '/auth/resetNewPassword',
+  async (payload: {
+    newPassword: string;
+    confirmNewPassword: string;
+    reset_password_token: string;
+  }): Promise<IUserAuthentication_Response> => {
+    try {
+      const resPromise: IUserAuthentication_Response = await axiosHelper.post(
+        `/auth/password/new/${payload.reset_password_token}`,
+        {
+          newPassword: payload.newPassword,
+          confirmNewPassword: payload.confirmNewPassword,
+        },
       );
 
       return Promise.resolve(resPromise);

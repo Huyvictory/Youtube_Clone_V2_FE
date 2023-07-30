@@ -31,15 +31,13 @@ axiosHelper.interceptors.response.use(
   (error) => {
     const status = error.response?.status;
 
-    console.log(error);
-
     switch (status) {
       case ExceptionCodes.UNAUTHORIZED:
-        showNotification(error.response?.data.message, 'error');
+        showNotification(error.response?.data.message, 'error', 2000);
 
         break;
       default: {
-        showNotification(error.response?.data.message, 'error');
+        showNotification(error.response?.data.message, 'error', 2000);
 
         break;
       }

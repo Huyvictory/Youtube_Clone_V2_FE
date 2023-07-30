@@ -1,26 +1,23 @@
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { IconButton, InputAdornment } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Backdrop from '@mui/material/Backdrop';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import CssBaseline from '@mui/material/CssBaseline';
-import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import {
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  CssBaseline,
+  IconButton,
+  InputAdornment,
+  Link,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { AUTH_TOKEN } from '@/constants';
-import { SignInPayload } from '@/contracts/auth';
-import { signIn } from '@/services/api/auth';
+import { resetNewPassword } from '@/services/api/auth';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { hasSpecifiedFieldError, renderFieldValidation } from '@/utils/formValidation';
-import { setLocalStorageKey } from '@/utils/localStorage';
 
 function Copyright(props: any) {
   return (
@@ -35,26 +32,34 @@ function Copyright(props: any) {
   );
 }
 
-const SignIn = () => {
+const ForgotPassword_ResetPassword = () => {
   const { isLoadingAuthForm } = useAppSelector((state) => state.auth);
 
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState<boolean>(false);
 
   const {
     register,
     handleSubmit,
-    watch,
     getValues,
     formState: { errors },
-  } = useForm<SignInPayload>();
+  } = useForm<{
+    newPassword: string;
+    confirmNewPassword: string;
+  }>();
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { resetPasswordToken } = useParams();
 
-  const handleClickShowPassword = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void => {
-    setShowPassword((previousState_ShowPassword) => !previousState_ShowPassword);
+  const toggleNewPasswords = (type: string): void => {
+    if (type === 'newPassword') {
+      setShowNewPassword((prevStateNewPassword) => !prevStateNewPassword);
+    } else if (type === 'confirmNewPassword') {
+      setShowConfirmNewPassword(
+        (prevStateConfirmNewPassword) => !prevStateConfirmNewPassword,
+      );
+    }
   };
 
   const handleMouseDownPassword = (
@@ -63,9 +68,10 @@ const SignIn = () => {
     event.preventDefault();
   };
 
-  const onSubmit = (data: SignInPayload) => {
-    dispatch(signIn(data)).then((res) => {
-      setLocalStorageKey(AUTH_TOKEN.USER_EMAIL, getValues('email'));
+  const onSubmit = (data: { newPassword: string; confirmNewPassword: string }) => {
+    dispatch(
+      resetNewPassword({ ...data, reset_password_token: resetPasswordToken as string }),
+    ).then((res: any) => {
       if (res.payload) {
         navigate('/');
       }
@@ -83,59 +89,75 @@ const SignIn = () => {
           alignItems: 'center',
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <LockOutlinedIcon />
-        </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Reset Your New Password
         </Typography>
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
           <TextField
             disabled={isLoadingAuthForm}
             margin="normal"
             required
-            {...register('email', {
-              required: 'Email is required.',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Invalid Email',
-              },
-            })}
-            error={hasSpecifiedFieldError(errors, 'email')}
-            helperText={<div>{renderFieldValidation(errors, 'email')}</div>}
-            fullWidth
-            label="Email Address"
-            autoComplete="email"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-          />
-          <TextField
-            disabled={isLoadingAuthForm}
-            margin="normal"
-            {...register('password', {
-              required: 'Password is required.',
+            {...register('newPassword', {
+              required: 'This field is required.',
               pattern: {
                 value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
                 message:
                   'Password must have 8 characters including a lowercase, uppercase, number',
               },
             })}
-            error={hasSpecifiedFieldError(errors, 'password')}
-            helperText={<div>{renderFieldValidation(errors, 'password')}</div>}
-            required
+            error={hasSpecifiedFieldError(errors, 'newPassword')}
+            helperText={<div>{renderFieldValidation(errors, 'newPassword')}</div>}
             fullWidth
-            label="Password"
-            type={showPassword ? 'text' : 'password'}
+            label="New Password"
+            type={showNewPassword ? 'text' : 'password'}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
+                    onClick={() => {
+                      toggleNewPasswords('newPassword');
+                    }}
                     onMouseDown={handleMouseDownPassword}
                     edge="end"
                   >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
+          />
+          <TextField
+            disabled={isLoadingAuthForm}
+            margin="normal"
+            {...register('confirmNewPassword', {
+              required: 'This field is required.',
+              pattern: {
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+                message:
+                  'Password must have 8 characters including a lowercase, uppercase, number',
+              },
+            })}
+            error={hasSpecifiedFieldError(errors, 'confirmNewPassword')}
+            helperText={<div>{renderFieldValidation(errors, 'confirmNewPassword')}</div>}
+            required
+            fullWidth
+            label="Confirm New Password"
+            type={showConfirmNewPassword ? 'text' : 'password'}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => {
+                      toggleNewPasswords('confirmNewPassword');
+                    }}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showConfirmNewPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -150,20 +172,8 @@ const SignIn = () => {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Sign In
+            Change Password
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="/forgot-password" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="/signup" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
         </Box>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
@@ -174,4 +184,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default ForgotPassword_ResetPassword;
