@@ -4,7 +4,8 @@ export interface IUserAuthentication {
   firstname: string;
   lastname: string;
   username: string;
-  Dob?: Date;
+  Dob: Date | null;
+  sex: string | null;
 }
 
 export interface IUserAuthentication_Response {
@@ -17,7 +18,7 @@ export interface IUserAuthentication_Response {
 
 export type SignUpPayload = Pick<
   IUserAuthentication,
-  'firstname' | 'lastname' | 'email' | 'password'
+  'firstname' | 'lastname' | 'email' | 'password' | 'Dob' | 'sex'
 >;
 
 export type SignUpVerificationResponseType = Pick<

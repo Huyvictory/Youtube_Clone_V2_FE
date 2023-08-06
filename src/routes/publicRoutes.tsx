@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 
 import { forgotpassword_Routes } from './forgot_password';
 
-const SignUp = lazy(() => import('@/pages/Auth/SignUp'));
+const SignUpContainer = lazy(() => import('@/pages/Auth/SignUp'));
 const Login = lazy(() => import('@/pages/Auth/SignIn'));
 const VerifyEmail = lazy(() => import('@/pages/Auth/VerifyEmail'));
 const ForgotPassword = lazy(() => import('@/pages/Auth/Forgot_Password'));
@@ -13,7 +13,7 @@ export const publicRoutes = [
     path: '/signup',
     element: (
       <Suspense fallback={<>Loading...</>}>
-        <SignUp />
+        <SignUpContainer />
       </Suspense>
     ),
   },

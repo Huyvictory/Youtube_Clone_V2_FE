@@ -12,7 +12,7 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FieldErrors, useForm, UseFormRegister } from 'react-hook-form';
 
 import { SignUpPayload } from '@/contracts/auth';
 import { signUp } from '@/services/api/auth';
@@ -33,29 +33,16 @@ function Copyright(props: any) {
   );
 }
 
-const SignUp = () => {
-  const { isLoadingAuthForm } = useAppSelector((state) => state.auth);
+const SignUp = ({
+  moveToNextStep,
+  register,
+  errors,
+}: {
+  moveToNextStep: () => void;
+  register: UseFormRegister<SignUpPayload>;
+  errors: FieldErrors<SignUpPayload>;
+}) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  const dispatch = useAppDispatch();
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<SignUpPayload>();
-
-  const onSubmit = (data: SignUpPayload) => {
-    dispatch(signUp(data)).then((res) => {
-      if (res.payload) {
-        showNotification(
-          'Sign up account successfully, Please verify your account.',
-          'info',
-        );
-      }
-    });
-  };
 
   const handleClickShowPassword = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -83,13 +70,10 @@ const SignUp = () => {
           alignItems: 'center',
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
+        <Typography sx={{ m: 2 }} component="h1" variant="h5">
           Sign up
         </Typography>
-        <Box component="form" noValidate onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
+        <Box sx={{ mt: 3 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -166,8 +150,25 @@ const SignUp = () => {
               />
             </Grid>
           </Grid>
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-            Sign Up
+          <Button
+            disabled={Object.keys(errors).length > 0}
+            onClick={() => {
+              moveToNextStep();
+            }}
+            fullWidth
+            variant="contained"
+            sx={{
+              mt: 3,
+              mb: 2,
+              '&.Mui-disabled': {
+                background: '#eaeaea',
+                color: '#c0c0c0',
+                cursor: 'not-allowed',
+                pointerEvents: 'all !important',
+              },
+            }}
+          >
+            Next Step
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
@@ -179,9 +180,6 @@ const SignUp = () => {
         </Box>
       </Box>
       <Copyright sx={{ mt: 5 }} />
-      <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingAuthForm}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
     </Box>
   );
 };
