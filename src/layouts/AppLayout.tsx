@@ -19,7 +19,7 @@ const Wrapper = styled.div`
 `;
 
 const AppLayout = () => {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
