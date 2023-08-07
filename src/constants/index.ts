@@ -3,6 +3,14 @@ export enum AUTH_TOKEN {
   USER_EMAIL = '@USER_EMAIL',
 }
 
+export enum PROFILE_FORMS {
+  PROFILE_PICTURE = 'Profile Picture',
+  PROFILE_NAME = 'Name',
+  PROFILE_BIRTHDAY = 'Birthday',
+  PROFILE_GENDER = 'Gender',
+  PROFILE_PASSWORD = 'Password',
+}
+
 export const ExceptionCodes = {
   OK: 200,
   CREATED: 201,

@@ -1,8 +1,36 @@
 import { ArrowForwardIosOutlined } from '@mui/icons-material';
 import { Avatar, Box, IconButton, Paper, Typography } from '@mui/material';
-import React from 'react';
+import { useState } from 'react';
+
+import {
+  Modal_Birthday,
+  Modal_Gender,
+  Modal_Name,
+  Modal_Password,
+  Modal_ProfilePicture,
+} from '@/components/ModalDialog/Forms';
+import ModalDialogForms from '@/components/ModalDialog/ModalDialogForm';
+import { PROFILE_FORMS } from '@/constants';
 
 const Profile = () => {
+  const [open, setOpen] = useState<boolean>(false);
+  const [formType, setFormType] = useState<string>('');
+
+  const renderForms_ModalDialog = (formtype: string): JSX.Element => {
+    switch (formtype) {
+      case PROFILE_FORMS.PROFILE_PICTURE:
+        return <Modal_ProfilePicture />;
+      case PROFILE_FORMS.PROFILE_NAME:
+        return <Modal_Name />;
+      case PROFILE_FORMS.PROFILE_BIRTHDAY:
+        return <Modal_Birthday />;
+      case PROFILE_FORMS.PROFILE_GENDER:
+        return <Modal_Gender />;
+      default:
+        return <Modal_Password />;
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -27,11 +55,13 @@ const Profile = () => {
           <Typography variant="h2" sx={{ fontSize: '1.375rem' }}>
             Basic Profile&apos;s Information
           </Typography>
-          <Typography>
-            Some information that could be shown to other people using this platform
-          </Typography>
+          <Typography>Update your account&apos;s information here</Typography>
         </Box>
         <Box
+          onClick={() => {
+            setFormType(PROFILE_FORMS.PROFILE_PICTURE);
+            setOpen(true);
+          }}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -58,6 +88,10 @@ const Profile = () => {
           </div>
         </Box>
         <Box
+          onClick={() => {
+            setFormType(PROFILE_FORMS.PROFILE_NAME);
+            setOpen(true);
+          }}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -82,6 +116,10 @@ const Profile = () => {
           </div>
         </Box>
         <Box
+          onClick={() => {
+            setFormType(PROFILE_FORMS.PROFILE_BIRTHDAY);
+            setOpen(true);
+          }}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -106,6 +144,10 @@ const Profile = () => {
           </div>
         </Box>
         <Box
+          onClick={() => {
+            setFormType(PROFILE_FORMS.PROFILE_GENDER);
+            setOpen(true);
+          }}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -122,7 +164,7 @@ const Profile = () => {
           </div>
           <div className="flex grow shrink justify-between">
             <span className="flex items-center font-normal text-[rgb(32,33,36)]">
-              Nam
+              Male
             </span>
             <IconButton>
               <ArrowForwardIosOutlined />
@@ -130,6 +172,10 @@ const Profile = () => {
           </div>
         </Box>
         <Box
+          onClick={() => {
+            setFormType(PROFILE_FORMS.PROFILE_PASSWORD);
+            setOpen(true);
+          }}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -152,6 +198,9 @@ const Profile = () => {
           </div>
         </Box>
       </Box>
+      <ModalDialogForms modal_form_name={formType} open={open} setOpen={setOpen}>
+        {renderForms_ModalDialog(formType)}
+      </ModalDialogForms>
     </Box>
   );
 };
