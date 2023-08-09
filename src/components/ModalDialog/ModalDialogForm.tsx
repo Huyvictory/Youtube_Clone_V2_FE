@@ -4,10 +4,16 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import * as React from 'react';
+import dayjs from 'dayjs';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { PROFILE_FORMS } from '@/constants';
+import { IUserAuthentication } from '@/contracts/auth';
+import { updateUserPassword, updateUserProfile } from '@/services/api/user';
+import { useAppDispatch, useAppSelector } from '@/services/hooks';
+import { showNotification } from '@/utils/notification';
 
 const ModalDialogForms = ({
   children,
@@ -20,20 +26,91 @@ const ModalDialogForms = ({
   setOpen: (open: boolean) => void;
   modal_form_name: string;
 }) => {
+  const { userPersonalDetail } = useAppSelector((state) => state.user);
   const {
+    reset,
     register,
     handleSubmit,
     control,
     getValues,
+    setValue,
     formState: { errors },
-  } = useForm<any>({ mode: 'onChange' });
+  } = useForm<IUserAuthentication>({ mode: 'all' });
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (userPersonalDetail) {
+      reset({
+        firstname: userPersonalDetail.firstname,
+        lastname: userPersonalDetail.lastname,
+        username: userPersonalDetail.username,
+        sex: userPersonalDetail.sex,
+        Dob: dayjs(userPersonalDetail.Dob),
+      });
+    }
+  }, [userPersonalDetail]);
 
   const handleClose = () => {
     setOpen(false);
   };
 
   const onSubmit = (data: any) => {
-    console.log(data);
+    const dataSentToServer = {
+      firstname: null,
+      lastname: null,
+      username: null,
+      sex: null,
+      Dob: null,
+    };
+
+    if (modal_form_name === PROFILE_FORMS.PROFILE_NAME) {
+      dispatch(
+        updateUserProfile({
+          ...dataSentToServer,
+          firstname: getValues('firstname'),
+          lastname: getValues('lastname'),
+          username: getValues('username'),
+        }),
+      ).then((res: any) => {
+        if (res.payload) {
+          showNotification(`Update ${modal_form_name} successfully`, 'success', 2000);
+        }
+        setOpen(false);
+      });
+    } else if (modal_form_name === PROFILE_FORMS.PROFILE_BIRTHDAY) {
+      dispatch(
+        updateUserProfile({
+          ...dataSentToServer,
+          Dob: getValues('Dob'),
+        }),
+      ).then((res: any) => {
+        if (res.payload) {
+          showNotification(`Update ${modal_form_name} successfully`, 'success', 2000);
+        }
+        setOpen(false);
+      });
+    } else if (modal_form_name === PROFILE_FORMS.PROFILE_GENDER) {
+      dispatch(
+        updateUserProfile({
+          ...dataSentToServer,
+          sex: getValues('sex'),
+        }),
+      ).then((res: any) => {
+        if (res.payload) {
+          showNotification(`Update ${modal_form_name} successfully`, 'success', 2000);
+        }
+        setOpen(false);
+      });
+    } else if (modal_form_name === PROFILE_FORMS.PROFILE_PASSWORD) {
+      const updatePasswordPayload = getValues('password');
+      dispatch(updateUserPassword(updatePasswordPayload as any)).then((res: any) => {
+        if (res.payload) {
+          showNotification(`Update ${modal_form_name} successfully`, 'success', 2000);
+          setOpen(false);
+        }
+      });
+    }
   };
 
   return (
@@ -68,6 +145,8 @@ const ModalDialogForms = ({
               register: register,
               errors: errors,
               control: control,
+              getValues: getValues,
+              setValue: setValue,
             })}
           </DialogContent>
           <DialogActions>

@@ -16,14 +16,13 @@ const Modal_Gender = (props: any) => {
         <Controller
           name="sex"
           control={props.control}
-          defaultValue={null}
           render={({ field: { value, onChange } }) => (
             <FormControl>
               <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
               <RadioGroup
                 row
                 aria-labelledby="demo-radio-buttons-group-label"
-                defaultValue={null}
+                defaultValue={value}
                 name="radio-buttons-group"
                 onChange={(event) => {
                   onChange(event.target.value);

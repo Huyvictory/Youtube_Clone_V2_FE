@@ -1,6 +1,15 @@
 import { ArrowForwardIosOutlined } from '@mui/icons-material';
-import { Avatar, Box, IconButton, Paper, Typography } from '@mui/material';
-import { useState } from 'react';
+import {
+  Avatar,
+  Backdrop,
+  Box,
+  CircularProgress,
+  IconButton,
+  Paper,
+  Typography,
+} from '@mui/material';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 
 import {
   Modal_Birthday,
@@ -11,10 +20,22 @@ import {
 } from '@/components/ModalDialog/Forms';
 import ModalDialogForms from '@/components/ModalDialog/ModalDialogForm';
 import { PROFILE_FORMS } from '@/constants';
+import { getUserProfile } from '@/services/api/user';
+import { useAppDispatch, useAppSelector } from '@/services/hooks';
 
 const Profile = () => {
+  const { userPersonalDetail, isLoadingUpdateProfile } = useAppSelector(
+    (state) => state.user,
+  );
+
   const [open, setOpen] = useState<boolean>(false);
   const [formType, setFormType] = useState<string>('');
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getUserProfile());
+  }, []);
 
   const renderForms_ModalDialog = (formtype: string): JSX.Element => {
     switch (formtype) {
@@ -49,6 +70,7 @@ const Profile = () => {
           width: '60%',
           border: '1px solid rgb(218,220,224)',
           padding: '20px 25px',
+          borderRadius: '20px',
         }}
       >
         <Box>
@@ -108,7 +130,7 @@ const Profile = () => {
           </div>
           <div className="flex grow shrink justify-between">
             <span className="flex items-center font-normal text-[rgb(32,33,36)]">
-              Huyvictory
+              {`${userPersonalDetail?.firstname} ${userPersonalDetail?.lastname}`}
             </span>
             <IconButton>
               <ArrowForwardIosOutlined />
@@ -136,7 +158,7 @@ const Profile = () => {
           </div>
           <div className="flex grow shrink justify-between">
             <span className="flex items-center font-normal text-[rgb(32,33,36)]">
-              DD/MM/YYYY
+              {dayjs(userPersonalDetail?.Dob).format('DD/MM/YYYY')}
             </span>
             <IconButton>
               <ArrowForwardIosOutlined />
@@ -164,7 +186,7 @@ const Profile = () => {
           </div>
           <div className="flex grow shrink justify-between">
             <span className="flex items-center font-normal text-[rgb(32,33,36)]">
-              Male
+              {userPersonalDetail?.sex}
             </span>
             <IconButton>
               <ArrowForwardIosOutlined />
@@ -201,6 +223,9 @@ const Profile = () => {
       <ModalDialogForms modal_form_name={formType} open={open} setOpen={setOpen}>
         {renderForms_ModalDialog(formType)}
       </ModalDialogForms>
+      <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingUpdateProfile}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };

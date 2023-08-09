@@ -1,7 +1,5 @@
 import { Box, TextField } from '@mui/material';
-import React from 'react';
 
-import { UpdateNamesPayload } from '@/contracts/profile';
 import { hasSpecifiedFieldError, renderFieldValidation } from '@/utils/formValidation';
 
 const Modal_Name = (props: any) => {
@@ -9,6 +7,7 @@ const Modal_Name = (props: any) => {
     <Box>
       <TextField
         // disabled={isLoadingAuthForm}
+        type="text"
         margin="normal"
         required
         {...props.register('firstname', {
@@ -18,11 +17,15 @@ const Modal_Name = (props: any) => {
         helperText={<div>{renderFieldValidation(props.errors, 'firstname')}</div>}
         fullWidth
         label="First Name"
+        onChange={(e) => {
+          props.setValue('username', `${e.target.value} ${props.getValues('lastname')}`);
+        }}
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus
       />
       <TextField
         // disabled={isLoadingAuthForm}
+        type="text"
         margin="normal"
         required
         {...props.register('lastname', {
@@ -32,9 +35,12 @@ const Modal_Name = (props: any) => {
         helperText={<div>{renderFieldValidation(props.errors, 'lastname')}</div>}
         fullWidth
         label="Last Name"
+        onChange={(e) => {
+          props.setValue('username', `${props.getValues('firstname')} ${e.target.value}`);
+        }}
       />
       <TextField
-        // disabled={isLoadingAuthForm}
+        disabled
         margin="normal"
         required
         {...props.register('username', {
@@ -43,7 +49,7 @@ const Modal_Name = (props: any) => {
         error={hasSpecifiedFieldError(props.errors, 'username')}
         helperText={<div>{renderFieldValidation(props.errors, 'username')}</div>}
         fullWidth
-        label="User Name"
+        label="User Name (Display Name)"
       />
     </Box>
   );

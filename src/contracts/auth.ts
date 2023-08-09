@@ -1,10 +1,12 @@
+import { Dayjs } from 'dayjs';
+
 export interface IUserAuthentication {
   email: string;
   password: string;
   firstname: string;
   lastname: string;
   username: string;
-  Dob: Date | null;
+  Dob: Date | Dayjs | null;
   sex: string | null;
 }
 
