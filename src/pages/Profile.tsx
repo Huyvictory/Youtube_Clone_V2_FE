@@ -102,11 +102,21 @@ const Profile = () => {
             <span className="flex items-center font-normal">
               Profile picture will help personalize your account
             </span>
-            <Avatar
-              alt="User Avatar"
-              src="https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg"
-              sx={{ width: 56, height: 56, cursor: 'pointer' }}
-            ></Avatar>
+            {userPersonalDetail?.user_avatar_media_id ? (
+              <Avatar
+                alt="User Avatar"
+                src="https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg"
+                sx={{ width: 56, height: 56, cursor: 'pointer' }}
+              ></Avatar>
+            ) : (
+              <Avatar
+                sx={{ width: 40, height: 40, cursor: 'pointer' }}
+              >{`${userPersonalDetail?.firstname
+                ?.charAt(0)
+                .toUpperCase()}${userPersonalDetail?.lastname
+                ?.charAt(0)
+                .toUpperCase()}`}</Avatar>
+            )}
           </div>
         </Box>
         <Box

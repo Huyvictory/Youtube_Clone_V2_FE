@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs';
 
-interface UserProfile {
+export interface UserProfile {
   email: string | null;
   password: string | null;
   firstname: string | null;
@@ -8,6 +8,7 @@ interface UserProfile {
   username: string | null;
   Dob: Date | Dayjs | null;
   sex: string | null;
+  user_avatar_media_id: string | null;
 }
 
 export type UpdateUserProfile_Payload = Pick<

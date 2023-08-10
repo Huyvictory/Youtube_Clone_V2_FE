@@ -4,6 +4,7 @@ import { IUserAuthentication } from '@/contracts/auth';
 import {
   UpdateUserPassword_Payload,
   UpdateUserProfile_Payload,
+  UserProfile,
 } from '@/contracts/profile';
 
 import axiosHelper from '../helper/axiosHelper';
@@ -13,13 +14,13 @@ export const getUserProfile = createAsyncThunk(
   async (): Promise<{
     message: string;
     status: number;
-    data: { data: IUserAuthentication };
+    data: { data: UserProfile };
   }> => {
     try {
       const resPromise: {
         message: string;
         status: 200;
-        data: { data: IUserAuthentication };
+        data: { data: UserProfile };
       } = await axiosHelper.get('/user/me');
 
       return Promise.resolve(resPromise);
@@ -36,13 +37,13 @@ export const updateUserProfile = createAsyncThunk(
   ): Promise<{
     message: string;
     status: number;
-    data: { data: IUserAuthentication };
+    data: { data: UserProfile };
   }> => {
     try {
       const resPromise: {
         message: string;
         status: number;
-        data: { data: IUserAuthentication };
+        data: { data: UserProfile };
       } = await axiosHelper.put('/user/update-profile', payload);
 
       return Promise.resolve(resPromise);

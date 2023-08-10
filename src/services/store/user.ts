@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { IUserAuthentication } from '@/contracts/auth';
+import { UserProfile } from '@/contracts/profile';
 
 import { getUserProfile, updateUserPassword, updateUserProfile } from '../api/user';
 
 // Define a type for the slice state
 interface AppState {
   isLoadingUpdateProfile: boolean;
-  userPersonalDetail?: IUserAuthentication;
+  userPersonalDetail?: UserProfile;
 }
 
 // Define the initial state using that type

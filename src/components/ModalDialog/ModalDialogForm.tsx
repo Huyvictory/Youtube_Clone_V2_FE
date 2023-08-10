@@ -10,7 +10,7 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { PROFILE_FORMS } from '@/constants';
-import { IUserAuthentication } from '@/contracts/auth';
+import { UserProfile } from '@/contracts/profile';
 import { updateUserPassword, updateUserProfile } from '@/services/api/user';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { showNotification } from '@/utils/notification';
@@ -35,7 +35,7 @@ const ModalDialogForms = ({
     getValues,
     setValue,
     formState: { errors },
-  } = useForm<IUserAuthentication>({ mode: 'all' });
+  } = useForm<UserProfile>({ mode: 'all' });
 
   const dispatch = useAppDispatch();
 
