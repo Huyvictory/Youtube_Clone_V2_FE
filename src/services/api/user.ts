@@ -70,3 +70,19 @@ export const updateUserPassword = createAsyncThunk(
     }
   },
 );
+
+export const updateUserAvatar = createAsyncThunk(
+  '/user/update-avatar',
+  async (payload: any): Promise<{ data: { data: { mediaUrl: string } } }> => {
+    try {
+      const resPromise: { data: { data: { mediaUrl: string } } } = await axiosHelper.put(
+        '/update/user/avatar_profile',
+        payload,
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);

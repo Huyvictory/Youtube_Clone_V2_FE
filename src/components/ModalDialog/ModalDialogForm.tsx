@@ -1,5 +1,5 @@
 import { Cancel } from '@mui/icons-material';
-import { Box, IconButton } from '@mui/material';
+import { Backdrop, Box, CircularProgress, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -11,7 +11,11 @@ import { useForm } from 'react-hook-form';
 
 import { PROFILE_FORMS } from '@/constants';
 import { UserProfile } from '@/contracts/profile';
-import { updateUserPassword, updateUserProfile } from '@/services/api/user';
+import {
+  updateUserAvatar,
+  updateUserPassword,
+  updateUserProfile,
+} from '@/services/api/user';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { showNotification } from '@/utils/notification';
 
@@ -26,7 +30,9 @@ const ModalDialogForms = ({
   setOpen: (open: boolean) => void;
   modal_form_name: string;
 }) => {
-  const { userPersonalDetail } = useAppSelector((state) => state.user);
+  const { userPersonalDetail, isLoadingUpdateProfile } = useAppSelector(
+    (state) => state.user,
+  );
   const {
     reset,
     register,
@@ -110,6 +116,17 @@ const ModalDialogForms = ({
           setOpen(false);
         }
       });
+    } else if (modal_form_name === PROFILE_FORMS.PROFILE_PICTURE) {
+      const formdata = new FormData();
+      formdata.append('file', (getValues('user_avatar_media_id') as any)[0]);
+      formdata.append('typeMedia', 'image');
+      formdata.append('typeImage', 'USER_PROFILE');
+      dispatch(updateUserAvatar(formdata)).then((res: any) => {
+        if (res.payload) {
+          showNotification(`Update ${modal_form_name} successfully`, 'success', 2000);
+          setOpen(false);
+        }
+      });
     }
   };
 
@@ -153,6 +170,9 @@ const ModalDialogForms = ({
             <Button type="submit">Submit</Button>
           </DialogActions>
         </Box>
+        <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingUpdateProfile}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </Dialog>
     </div>
   );

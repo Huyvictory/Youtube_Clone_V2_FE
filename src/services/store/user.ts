@@ -2,7 +2,12 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { UserProfile } from '@/contracts/profile';
 
-import { getUserProfile, updateUserPassword, updateUserProfile } from '../api/user';
+import {
+  getUserProfile,
+  updateUserAvatar,
+  updateUserPassword,
+  updateUserProfile,
+} from '../api/user';
 
 // Define a type for the slice state
 interface AppState {
@@ -51,6 +56,17 @@ export const appSlice = createSlice({
       })
       .addCase(updateUserPassword.fulfilled, (state) => {
         state.isLoadingUpdateProfile = false;
+      })
+      .addCase(updateUserAvatar.pending, (state) => {
+        state.isLoadingUpdateProfile = true;
+      })
+      .addCase(updateUserAvatar.rejected, (state) => {
+        state.isLoadingUpdateProfile = false;
+      })
+      .addCase(updateUserAvatar.fulfilled, (state, action) => {
+        state.isLoadingUpdateProfile = false;
+        (state.userPersonalDetail as UserProfile).user_avatar_media_id.media_url =
+          action.payload.data.data.mediaUrl;
       });
   },
 });

@@ -33,10 +33,6 @@ const Profile = () => {
 
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    dispatch(getUserProfile());
-  }, []);
-
   const renderForms_ModalDialog = (formtype: string): JSX.Element => {
     switch (formtype) {
       case PROFILE_FORMS.PROFILE_PICTURE:
@@ -105,7 +101,7 @@ const Profile = () => {
             {userPersonalDetail?.user_avatar_media_id ? (
               <Avatar
                 alt="User Avatar"
-                src="https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg"
+                src={userPersonalDetail?.user_avatar_media_id.media_url}
                 sx={{ width: 56, height: 56, cursor: 'pointer' }}
               ></Avatar>
             ) : (
@@ -233,9 +229,6 @@ const Profile = () => {
       <ModalDialogForms modal_form_name={formType} open={open} setOpen={setOpen}>
         {renderForms_ModalDialog(formType)}
       </ModalDialogForms>
-      <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingUpdateProfile}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
     </Box>
   );
 };

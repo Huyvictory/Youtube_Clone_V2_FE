@@ -8,7 +8,7 @@ export interface UserProfile {
   username: string | null;
   Dob: Date | Dayjs | null;
   sex: string | null;
-  user_avatar_media_id: string | null;
+  user_avatar_media_id: { media_url: string | undefined };
 }
 
 export type UpdateUserProfile_Payload = Pick<

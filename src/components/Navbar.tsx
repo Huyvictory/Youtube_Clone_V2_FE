@@ -13,6 +13,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { useAppSelector } from '@/services/hooks';
+
 const Container = styled.div`
   position: sticky;
   top: 0;
@@ -63,6 +65,8 @@ const Button = styled.button`
   gap: 5px;
 `;
 const Navbar = () => {
+  const { userPersonalDetail } = useAppSelector((state) => state.user);
+
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const settings = ['Profile', 'Logout'];
@@ -87,7 +91,11 @@ const Navbar = () => {
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
               <Avatar
                 alt="User Avatar"
-                src="https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg"
+                src={
+                  !userPersonalDetail?.user_avatar_media_id
+                    ? 'https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg'
+                    : userPersonalDetail.user_avatar_media_id.media_url
+                }
               />
             </IconButton>
           </Tooltip>

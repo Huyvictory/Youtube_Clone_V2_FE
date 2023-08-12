@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 
 import Menu from '@/components/Menu';
 import Navbar from '@/components/Navbar';
+import { getUserProfile } from '@/services/api/user';
+import { useAppDispatch } from '@/services/hooks';
 import { darkTheme, lightTheme } from '@/utils/Theme';
 
 const Container = styled.div`
@@ -20,6 +22,12 @@ const Wrapper = styled.div`
 
 const AppLayout = () => {
   const [darkMode, setDarkMode] = useState(false);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getUserProfile());
+  }, []);
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
