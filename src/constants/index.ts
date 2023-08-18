@@ -1,3 +1,5 @@
+import { toolbarFormatQuill, toolbarQuill } from './Quill_RichTextEditor';
+
 export enum AUTH_TOKEN {
   AUTH_TOKEN = '@AUTH_TOKEN_YC',
   USER_EMAIL = '@USER_EMAIL',
@@ -30,3 +32,25 @@ export const toastOptions = {
   pauseOnFocusLoss: false,
   progress: undefined,
 };
+
+export const profileMenuSettings: Array<{
+  to?: string;
+  profileMenuName: string;
+  onClickHanlder_MenuItem: (cb: () => void) => void;
+}> = [
+  {
+    to: '/profile',
+    profileMenuName: 'Profile',
+    onClickHanlder_MenuItem: (cb) => {
+      cb();
+    },
+  },
+  {
+    profileMenuName: 'Logout',
+    onClickHanlder_MenuItem: (cb) => {
+      cb();
+    },
+  },
+];
+
+export { toolbarFormatQuill, toolbarQuill };

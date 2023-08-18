@@ -1,4 +1,4 @@
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import { VideoCallOutlined } from '@mui/icons-material';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import {
   Avatar,
@@ -13,7 +13,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { profileMenuSettings } from '@/constants';
 import { useAppSelector } from '@/services/hooks';
+import { removeLocalStorageKey } from '@/utils/localStorage';
+
+import ModalUploadVideo from './video/ModalUploadVideo';
 
 const Container = styled.div`
   position: sticky;
@@ -64,15 +68,26 @@ const Button = styled.button`
   align-items: center;
   gap: 5px;
 `;
+
+const UploadVideoIcon = styled(VideoCallOutlined)`
+  color: ${({ theme }) => theme.text};
+`;
+
 const Navbar = () => {
   const { userPersonalDetail } = useAppSelector((state) => state.user);
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-  const settings = ['Profile', 'Logout'];
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
+  };
+
+  const hanldeLogout = () => {
+    setAnchorElUser(null);
+    removeLocalStorageKey('@AUTH_TOKEN_YC');
+    window.location.href = '/';
   };
 
   const handleCloseUserMenu = () => {
@@ -87,7 +102,18 @@ const Navbar = () => {
           <SearchOutlinedIcon />
         </Search>
         <Box>
-          <Tooltip title="Open settings">
+          <Tooltip title="Upload your video">
+            <IconButton
+              sx={{ mr: 2 }}
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
+              <UploadVideoIcon fontSize="large" />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Open user profile settings">
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
               <Avatar
                 alt="User Avatar"
@@ -114,25 +140,36 @@ const Navbar = () => {
             open={Boolean(anchorElUser)}
             onClose={handleCloseUserMenu}
           >
-            {settings.map((setting, index) => {
-              if (setting === 'Profile') {
+            {profileMenuSettings.map((setting, index) => {
+              if (!setting.to && setting.profileMenuName === 'Logout') {
                 return (
-                  <Link key={index} to="/profile">
-                    <MenuItem onClick={handleCloseUserMenu}>
-                      <Typography textAlign="center">{setting}</Typography>
-                    </MenuItem>
-                  </Link>
+                  <MenuItem
+                    key={index}
+                    onClick={() => {
+                      setting.onClickHanlder_MenuItem(hanldeLogout);
+                    }}
+                  >
+                    <Typography textAlign="center">{setting.profileMenuName}</Typography>
+                  </MenuItem>
                 );
               }
+
               return (
-                <MenuItem key={index} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
+                <Link key={index} to={setting.to as string}>
+                  <MenuItem
+                    onClick={() => {
+                      setting.onClickHanlder_MenuItem(handleCloseUserMenu);
+                    }}
+                  >
+                    <Typography textAlign="center">{setting.profileMenuName}</Typography>
+                  </MenuItem>
+                </Link>
               );
             })}
           </Menu>
         </Box>
       </Wrapper>
+      <ModalUploadVideo open={open} setOpen={setOpen} />
     </Container>
   );
 };
