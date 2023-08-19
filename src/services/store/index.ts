@@ -2,10 +2,12 @@ import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolki
 
 import authReducer from './auth';
 import userReducer from './user';
+import videoReducer from './video';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
   user: userReducer,
+  video: videoReducer,
 });
 
 export const store = configureStore({

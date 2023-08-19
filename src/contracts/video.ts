@@ -6,3 +6,8 @@ export type CreateVideoPayload = {
   video_description?: string;
   typeImage: string;
 };
+
+export type Video_Categories = {
+  _id: string;
+  video_category_name: string;
+};

@@ -169,7 +169,7 @@ const Navbar = () => {
           </Menu>
         </Box>
       </Wrapper>
-      <ModalUploadVideo open={open} setOpen={setOpen} />
+      {open && <ModalUploadVideo open={open} setOpen={setOpen} />}
     </Container>
   );
 };

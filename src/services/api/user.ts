@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import { IUserAuthentication } from '@/contracts/auth';
 import {
   UpdateUserPassword_Payload,
   UpdateUserProfile_Payload,

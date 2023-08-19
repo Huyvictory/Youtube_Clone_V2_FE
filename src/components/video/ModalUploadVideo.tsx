@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import 'react-quill/dist/quill.snow.css';
-import 'react-quill/dist/quill.core.css';
 
 import { Cancel } from '@mui/icons-material';
 import {
@@ -21,13 +20,16 @@ import {
   Select,
   TextField,
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 
 import { toolbarFormatQuill, toolbarQuill } from '@/constants';
 import { CreateVideoPayload } from '@/contracts/video';
+import { createNewVideo, getVideoCategories } from '@/services/api/video';
+import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { hasSpecifiedFieldError, renderFieldValidation } from '@/utils/formValidation';
+import { showNotification } from '@/utils/notification';
 
 const ModalUploadVideo = ({
   open,
@@ -36,18 +38,18 @@ const ModalUploadVideo = ({
   open: boolean;
   setOpen: (open: boolean) => void;
 }) => {
-  const [valueRichText_Editor, setValueRichText_Editor] = useState<string>('');
+  const { isLoadingVideo, videoCategoriesList } = useAppSelector((state) => state.video);
+
+  const [valueRichText_Editor, setValueRichText_Editor] = useState<string>();
   const [videoCategoryId, setVideoCategoryId] = useState<string>();
   const [previewImage, setPreviewImage] = useState<string>();
   const [previewVideo, setPreviewVideo] = useState<string>();
 
+  const dispatch = useAppDispatch();
+
   const {
-    reset,
     register,
     handleSubmit,
-    control,
-    getValues,
-    setValue,
     formState: { errors },
   } = useForm<CreateVideoPayload>({ mode: 'all' });
 
@@ -63,14 +65,25 @@ const ModalUploadVideo = ({
   const sendVideoInformations = (data: CreateVideoPayload) => {
     const videoFile = (data.video as any)[0];
     const videoThumbnailFile = (data.video_thumbnail as any)[0];
-    console.log({
-      ...data,
-      video: videoFile,
-      video_thumbnail: videoThumbnailFile,
-      typeImage: 'VIDEO_THUMBNAIL',
-      video_description: valueRichText_Editor,
+
+    const createVideoFormData = new FormData();
+    createVideoFormData.append('video', videoFile);
+    createVideoFormData.append('video_thumbnail', videoThumbnailFile);
+    createVideoFormData.append('video_title', data.video_title);
+    createVideoFormData.append('video_description', valueRichText_Editor as string);
+    createVideoFormData.append('video_category_id', data.video_category_id);
+    createVideoFormData.append('typeImage', 'VIDEO_THUMBNAIL');
+    dispatch(createNewVideo(createVideoFormData)).then((res: any) => {
+      if (res.payload) {
+        showNotification('Created Video successfully', 'success', 2000);
+        setOpen(false);
+      }
     });
   };
+
+  useEffect(() => {
+    dispatch(getVideoCategories());
+  }, []);
 
   return (
     <Box>
@@ -114,16 +127,6 @@ const ModalUploadVideo = ({
               error={hasSpecifiedFieldError(errors, 'video_title')}
               helperText={<div>{renderFieldValidation(errors, 'video_title')}</div>}
             />
-            <ReactQuill
-              theme="snow"
-              placeholder="Type your video description here"
-              modules={toolbarQuill}
-              formats={toolbarFormatQuill}
-              value={valueRichText_Editor}
-              onChange={(value) => {
-                setValueRichText_Editor(value);
-              }}
-            />
             <FormControl
               fullWidth
               margin="normal"
@@ -143,15 +146,35 @@ const ModalUploadVideo = ({
                   setVideoCategoryId(e.target.value);
                 }}
               >
-                <MenuItem value={'Animals'}>Animals</MenuItem>
-                <MenuItem value={'Nature'}>Nature</MenuItem>
-                <MenuItem value={'People'}>People</MenuItem>
+                {videoCategoriesList?.map((videoCategory) => (
+                  <MenuItem key={videoCategory._id} value={videoCategory._id}>
+                    {videoCategory.video_category_name}
+                  </MenuItem>
+                ))}
               </Select>
               {errors.video_category_id && (
                 <FormHelperText>{errors.video_category_id.message}</FormHelperText>
               )}
             </FormControl>
+            <Box>
+              <InputLabel sx={{ my: 1 }}>Video Description</InputLabel>
+              <ReactQuill
+                theme="snow"
+                placeholder="Type your video description here"
+                modules={toolbarQuill}
+                formats={toolbarFormatQuill}
+                value={valueRichText_Editor}
+                onChange={(value) => {
+                  setValueRichText_Editor(value);
+                }}
+              />
+            </Box>
+
             <Box sx={{ my: 2 }}>
+              <InputLabel sx={{ my: 1 }}>Upload Video Thumbnail</InputLabel>
+              {errors.video_thumbnail && (
+                <p className="text-[#d32f2f]">{errors.video_thumbnail.message}</p>
+              )}
               <input
                 {...register('video_thumbnail', {
                   required: 'Video thumbnail is required',
@@ -163,6 +186,13 @@ const ModalUploadVideo = ({
                 onChange={handleChangeImage}
               />
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                {!previewImage && (
+                  <img
+                    src="https://peoplevine.blob.core.windows.net/media/72/e86f3854-ebcf-4025-ae66-220b51f77ec2/image_not_available.png"
+                    alt="placeholder_video_thumbnail"
+                    width={'1200px'}
+                  />
+                )}
                 {previewImage && (
                   <Avatar
                     sx={{ width: 100, height: 100, cursor: 'pointer' }}
@@ -170,11 +200,10 @@ const ModalUploadVideo = ({
                   />
                 )}
               </Box>
-              {errors.video_thumbnail && (
-                <p className="text-[#d32f2f]">{errors.video_thumbnail.message}</p>
-              )}
             </Box>
             <Box sx={{ mt: 2 }}>
+              <InputLabel sx={{ my: 1 }}>Upload Video</InputLabel>
+              {errors.video && <p className="text-[#d32f2f]">{errors.video.message}</p>}
               <input
                 {...register('video', { required: 'Video is required' })}
                 accept="video/*"
@@ -184,25 +213,23 @@ const ModalUploadVideo = ({
                 onChange={handleChangeVideoUpload}
               />
             </Box>
-            {errors.video && <p className="text-[#d32f2f]">{errors.video.message}</p>}
+
             {!previewVideo && (
               <img
                 src="	https://i9.ytimg.com/vi_webp/k3Vfj-e1Ma4/mqdefault…qp=CIjm8JUG&rs=AOn4CLDeKmf_vlMC1q9RBEZu-XQApzm6sA"
-                alt="placeholder_video_image"
+                alt="placeholder_video_preview"
                 width={'1200px'}
               />
             )}
             {previewVideo && (
-              <video autoPlay width={'100%'} controls>
-                <source src={previewVideo}></source>
-              </video>
+              <video autoPlay width={'100%'} controls src={previewVideo}></video>
             )}
           </DialogContent>
           <DialogActions>
             <Button type="submit">Submit</Button>
           </DialogActions>
         </Box>
-        <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={false}>
+        <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingVideo}>
           <CircularProgress color="inherit" />
         </Backdrop>
       </Dialog>

@@ -10,13 +10,13 @@ import {
 } from '../api/user';
 
 // Define a type for the slice state
-interface AppState {
+interface UserState {
   isLoadingUpdateProfile: boolean;
   userPersonalDetail?: UserProfile;
 }
 
 // Define the initial state using that type
-const initialState: AppState = {
+const initialState: UserState = {
   isLoadingUpdateProfile: false,
   userPersonalDetail: undefined,
 };
