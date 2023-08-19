@@ -43,16 +43,19 @@ export const getListVideos = createAsyncThunk(
   async (payload: {
     page: number;
     limit: number;
-    videoCategory?: Array<string>;
+    videoCategory?: string;
   }): Promise<{
     data: { data: Array<GetListVideos_Response> };
   }> => {
+    let urlAPICall = `/video/getVideosList?page=${payload.page}&limit=${payload.limit}`;
+
+    if (payload.videoCategory) {
+      urlAPICall += `&videoCategory=${payload.videoCategory}`;
+    }
     try {
       const resPromise: {
         data: { data: Array<GetListVideos_Response> };
-      } = await axiosHelper.get(
-        `/video/getVideosList?page=${payload.page}&limit=${payload.limit}`,
-      );
+      } = await axiosHelper.get(urlAPICall);
 
       return Promise.resolve(resPromise);
     } catch (error) {
