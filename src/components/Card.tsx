@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { GetListVideos_Response } from '@/contracts/video';
+
 const Container: any = styled.div`
   width: ${({ type }: any) => type !== 'sm' && '360px'};
   margin-bottom: ${({ type }: any) => (type === 'sm' ? '10px' : '45px')};
@@ -50,23 +52,17 @@ const Info = styled.div`
   color: ${({ theme }) => theme.textSoft};
 `;
 
-const Card = ({ type }: any) => {
+const Card = ({ type, video }: { type: any; video: GetListVideos_Response }) => {
   return (
     <Link to="/video/1" style={{ textDecoration: 'none' }}>
       <Container type={type}>
-        <Image
-          type={type}
-          src="https://i9.ytimg.com/vi_webp/k3Vfj-e1Ma4/mqdefault.webp?v=6277c159&sqp=CIjm8JUG&rs=AOn4CLDeKmf_vlMC1q9RBEZu-XQApzm6sA"
-        />
+        <Image type={type} src={video.video_thumbnail_media_id.media_url} />
         <Details type={type}>
-          <ChannelImage
-            type={type}
-            src="https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo"
-          />
+          <ChannelImage type={type} src={video.user_id.user_avatar_media_id.media_url} />
           <Texts>
-            <Title>Test Video</Title>
-            <ChannelName>Lama Dev</ChannelName>
-            <Info>660,908 views • 1 day ago</Info>
+            <Title>{video.video_title}</Title>
+            <ChannelName>{video.channel_id.channel_name}</ChannelName>
+            <Info>{video.video_views} views • 1 day ago</Info>
           </Texts>
         </Details>
       </Container>

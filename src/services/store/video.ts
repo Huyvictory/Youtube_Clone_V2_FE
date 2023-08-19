@@ -1,19 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { Video_Categories } from '@/contracts/video';
+import { GetListVideos_Response, Video_Categories } from '@/contracts/video';
 
-import { createNewVideo, getVideoCategories } from '../api/video';
+import { createNewVideo, getListVideos, getVideoCategories } from '../api/video';
 
 // Define a type for the slice state
 interface VideoState {
   isLoadingVideo: boolean;
+  isLoadingVideo_GetList: boolean;
   videoCategoriesList?: Array<Video_Categories>;
+  videoList?: Array<GetListVideos_Response>;
 }
 
 // Define the initial state using that type
 const initialState: VideoState = {
   isLoadingVideo: false,
+  isLoadingVideo_GetList: false,
   videoCategoriesList: undefined,
+  videoList: undefined,
 };
 
 export const appSlice = createSlice({
@@ -41,6 +45,16 @@ export const appSlice = createSlice({
       })
       .addCase(createNewVideo.fulfilled, (state) => {
         state.isLoadingVideo = false;
+      })
+      .addCase(getListVideos.pending, (state) => {
+        state.isLoadingVideo_GetList = true;
+      })
+      .addCase(getListVideos.rejected, (state) => {
+        state.isLoadingVideo_GetList = false;
+      })
+      .addCase(getListVideos.fulfilled, (state, action) => {
+        state.isLoadingVideo_GetList = false;
+        state.videoList = action.payload.data.data;
       });
   },
 });
