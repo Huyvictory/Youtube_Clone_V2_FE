@@ -54,7 +54,7 @@ const Info = styled.div`
 
 const Card = ({ type, video }: { type: any; video: GetListVideos_Response }) => {
   return (
-    <Link to="/video/1" style={{ textDecoration: 'none' }}>
+    <Link to={`/video/${video._id}`} style={{ textDecoration: 'none' }}>
       <Container type={type}>
         <Image type={type} src={video.video_thumbnail_media_id.media_url} />
         <Details type={type}>

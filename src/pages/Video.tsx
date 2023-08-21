@@ -2,8 +2,15 @@ import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import ThumbDownOffAltOutlinedIcon from '@mui/icons-material/ThumbDownOffAltOutlined';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
+import { Backdrop, Box, CircularProgress } from '@mui/material';
+import dayjs from 'dayjs';
 import { useEffect } from 'react';
+import ReactPlayer from 'react-player';
+import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+
+import { getListVideos, getVideoByItsId } from '@/services/api/video';
+import { useAppDispatch, useAppSelector } from '@/services/hooks';
 
 import Card from '../components/Card';
 import Comments from '../components/Comments';
@@ -54,7 +61,7 @@ const Hr = styled.hr`
   border: 0.5px solid ${({ theme }) => theme.soft};
 `;
 
-const Recommendation = styled.div`
+const Recommendation = styled(Box)`
   flex: 2;
 `;
 const Channel = styled.div`
@@ -106,29 +113,49 @@ const Subscribe = styled.button`
 `;
 
 const Video = () => {
+  const { videoList, isLoadingVideo, videoDetail } = useAppSelector(
+    (state) => state.video,
+  );
+
+  const dispatch = useAppDispatch();
+
+  const location = useLocation();
+
   useEffect(() => {
-    console.log('re render again in video layout');
+    dispatch(getListVideos({ page: 1, limit: 10 }));
   }, []);
+
+  useEffect(() => {
+    dispatch(
+      getVideoByItsId({
+        videoId: location.pathname.substring(location.pathname.lastIndexOf('/') + 1),
+      }),
+    );
+  }, [location]);
 
   return (
     <Container>
       <Content>
         <VideoWrapper>
-          <iframe
-            width="100%"
-            height="720"
-            src="https://www.youtube.com/embed/k3Vfj-e1Ma4"
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
+          <ReactPlayer
+            controls={true}
+            playing={true}
+            volume={0.5}
+            muted={true}
+            url={videoDetail?.video_url}
+            width={'100%'}
+            height={'55vh'}
+          />
         </VideoWrapper>
-        <Title>Test Video</Title>
+        <Title>{videoDetail?.video_title}</Title>
         <Details>
-          <Info>7,948,154 views • Jun 22, 2022</Info>
+          <Info>
+            {videoDetail?.video_views} views •{' '}
+            {dayjs(videoDetail?.createdAt).format('MMM DD, YYYY')}{' '}
+          </Info>
           <Buttons>
             <Button>
-              <ThumbUpOutlinedIcon /> 123
+              <ThumbUpOutlinedIcon /> {videoDetail?.video_like_count}
             </Button>
             <Button>
               <ThumbDownOffAltOutlinedIcon /> Dislike
@@ -144,15 +171,18 @@ const Video = () => {
         <Hr />
         <Channel>
           <ChannelInfo>
-            <Image src="https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo" />
+            <Image src={videoDetail?.user_id.user_avatar_media_id.media_url} />
             <ChannelDetail>
-              <ChannelName>Lama Dev</ChannelName>
-              <ChannelCounter>200K subscribers</ChannelCounter>
+              <ChannelName>{videoDetail?.channel_id.channel_name}</ChannelName>
+              <ChannelCounter>
+                {videoDetail?.channel_id?.channel_subscribers.length} subscribers
+              </ChannelCounter>
               <Description>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Doloribus
-                laborum delectus unde quaerat dolore culpa sit aliquam at. Vitae facere
-                ipsum totam ratione exercitationem. Suscipit animi accusantium dolores
-                ipsam ut.
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: videoDetail?.video_description as string,
+                  }}
+                ></div>
               </Description>
             </ChannelDetail>
           </ChannelInfo>
@@ -162,20 +192,12 @@ const Video = () => {
         <Comments />
       </Content>
       <Recommendation>
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
+        {videoList &&
+          videoList?.map((video) => <Card key={video._id} type={'sm'} video={video} />)}
       </Recommendation>
+      <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingVideo}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Container>
   );
 };

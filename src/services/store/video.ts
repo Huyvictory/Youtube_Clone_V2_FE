@@ -1,15 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { GetListVideos_Response, Video_Categories } from '@/contracts/video';
+import {
+  GetListVideos_Response,
+  GetVideoByID_Response,
+  Video_Categories,
+} from '@/contracts/video';
 
-import { createNewVideo, getListVideos, getVideoCategories } from '../api/video';
+import {
+  createNewVideo,
+  getListVideos,
+  getVideoByItsId,
+  getVideoCategories,
+} from '../api/video';
 
 // Define a type for the slice state
 interface VideoState {
   isLoadingVideo: boolean;
   isLoadingVideo_GetList: boolean;
   videoCategoriesList?: Array<Video_Categories>;
-  videoList?: Array<GetListVideos_Response>;
+  videoList: Array<GetListVideos_Response>;
+  videoDetail?: GetVideoByID_Response;
+  videoPage: number;
 }
 
 // Define the initial state using that type
@@ -17,14 +28,20 @@ const initialState: VideoState = {
   isLoadingVideo: false,
   isLoadingVideo_GetList: false,
   videoCategoriesList: undefined,
-  videoList: undefined,
+  videoList: [],
+  videoDetail: undefined,
+  videoPage: 1,
 };
 
-export const appSlice = createSlice({
+export const videoSlice = createSlice({
   name: 'video',
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
-  reducers: {},
+  reducers: {
+    updateNextVideoPage: (state, action) => {
+      state.videoPage = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getVideoCategories.pending, (state) => {
@@ -54,11 +71,21 @@ export const appSlice = createSlice({
       })
       .addCase(getListVideos.fulfilled, (state, action) => {
         state.isLoadingVideo_GetList = false;
-        state.videoList = action.payload.data.data;
+        state.videoList = state.videoList?.concat(action.payload.data.data);
+      })
+      .addCase(getVideoByItsId.pending, (state) => {
+        state.isLoadingVideo = true;
+      })
+      .addCase(getVideoByItsId.rejected, (state) => {
+        state.isLoadingVideo = false;
+      })
+      .addCase(getVideoByItsId.fulfilled, (state, action) => {
+        state.isLoadingVideo = false;
+        state.videoDetail = action.payload.data.data;
       });
   },
 });
 
-export default appSlice.reducer;
+export default videoSlice.reducer;
 
-// export const { setAppLoading } = appSlice.actions;
+export const { updateNextVideoPage } = videoSlice.actions;

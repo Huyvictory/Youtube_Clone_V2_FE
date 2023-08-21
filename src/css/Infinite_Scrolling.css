@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.infinite-scroll-component__outerdiv {
+  width: 100%;
+}
+
+.infinite-scroll-component__outerdiv .infinite-scroll-component {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 5px;
+}

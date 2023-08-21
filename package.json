@@ -25,6 +25,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.2",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-otp-input": "^2.4.0",
     "react-player": "^2.12.0",
     "react-quill": "^2.0.0",

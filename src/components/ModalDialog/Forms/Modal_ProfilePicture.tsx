@@ -9,22 +9,15 @@ const Modal_ProfilePicture = (props: any) => {
   const { userPersonalDetail } = useAppSelector((state) => state.user);
 
   const [previewImage, setPreviewImage] = useState<string>();
-  const [previewVideo, setPreviewVideo] = useState<string>();
-
-  const videoRef: any = useRef();
 
   const handleChangeImage = (e: any) => {
     setPreviewImage(e.target.files[0]);
     setPreviewImage(URL.createObjectURL(e.target.files[0]));
   };
 
-  const handleChangeVideoUpload = (e: any) => {
-    setPreviewVideo(URL.createObjectURL(e.target.files[0]));
-  };
-
   useEffect(() => {
     if (userPersonalDetail) {
-      setPreviewImage(userPersonalDetail?.user_avatar_media_id.media_url);
+      setPreviewImage(userPersonalDetail?.user_avatar_media_id?.media_url);
     }
   }, [userPersonalDetail]);
 
@@ -46,19 +39,6 @@ const Modal_ProfilePicture = (props: any) => {
           />
         )}
       </Box>
-      {/* <Box sx={{ mt: 2 }}>
-        <input
-          accept="video/*"
-          id="raised-video-file"
-          type="file"
-          onChange={handleChangeVideoUpload}
-        />
-      </Box>
-      {previewVideo && (
-        <video autoPlay ref={videoRef} width={'250px'} controls>
-          <source src={previewVideo}></source>
-        </video>
-      )} */}
     </Box>
   );
 };

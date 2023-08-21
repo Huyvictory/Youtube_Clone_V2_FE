@@ -22,7 +22,7 @@ export const appRoutes = [
     ),
   },
   {
-    path: '/video/:id',
+    path: '/video/:videoId',
     element: (
       <Suspense fallback={<>Loading...</>}>
         <Video />

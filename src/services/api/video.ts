@@ -1,6 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import { GetListVideos_Response, Video_Categories } from '@/contracts/video';
+import {
+  GetListVideos_Response,
+  GetVideoByID_Response,
+  Video_Categories,
+} from '@/contracts/video';
 
 import axiosHelper from '../helper/axiosHelper';
 
@@ -56,6 +60,23 @@ export const getListVideos = createAsyncThunk(
       const resPromise: {
         data: { data: Array<GetListVideos_Response> };
       } = await axiosHelper.get(urlAPICall);
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const getVideoByItsId = createAsyncThunk(
+  '/video/detail',
+  async (payload: {
+    videoId: string;
+  }): Promise<{ data: { data: GetVideoByID_Response } }> => {
+    try {
+      const resPromise: { data: { data: GetVideoByID_Response } } = await axiosHelper.get(
+        `/video/getVideoDetail/${payload.videoId}`,
+      );
 
       return Promise.resolve(resPromise);
     } catch (error) {

@@ -1,3 +1,5 @@
+import '@/css/Infinite_Scrolling.css';
+
 import {
   Backdrop,
   Box,
@@ -6,10 +8,12 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import styled from 'styled-components';
 
 import { getListVideos, getVideoCategories } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
+import { updateNextVideoPage } from '@/services/store/video';
 
 import Card from '../components/Card';
 
@@ -26,11 +30,11 @@ const CustomToggleButton = styled(ToggleButton)`
 `;
 
 const Home = () => {
-  const { isLoadingVideo_GetList, videoList, videoCategoriesList } = useAppSelector(
-    (state) => state.video,
-  );
+  const { isLoadingVideo_GetList, videoList, videoCategoriesList, videoPage } =
+    useAppSelector((state) => state.video);
 
   const [activeVideoCategory, setActiveVideoCategory] = useState<string | null>('');
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
   const dispatch = useAppDispatch();
 
@@ -41,12 +45,16 @@ const Home = () => {
   useEffect(() => {
     dispatch(
       getListVideos({
-        page: 1,
-        limit: 10,
+        page: videoPage,
+        limit: 12,
         videoCategory: activeVideoCategory ?? undefined,
       }),
-    );
-  }, [activeVideoCategory]);
+    ).then((res: any) => {
+      if (res.payload.data.data.length === 0) {
+        setHasMore(false);
+      }
+    });
+  }, [activeVideoCategory, videoPage]);
 
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
@@ -55,6 +63,12 @@ const Home = () => {
     if (newAlignmentButtonValue !== null) {
       setActiveVideoCategory(newAlignmentButtonValue);
     }
+  };
+
+  const handleNextVideoPage_InfiniteScrolling = () => {
+    setTimeout(() => {
+      dispatch(updateNextVideoPage(videoPage + 1));
+    }, 2000);
   };
 
   return (
@@ -78,10 +92,25 @@ const Home = () => {
         </ToggleButtonGroup>
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        {videoList &&
-          videoList?.map((video) => (
-            <Card key={video._id} type={'undefined'} video={video} />
-          ))}
+        <InfiniteScroll
+          dataLength={videoList.length}
+          height={750}
+          next={() => {
+            handleNextVideoPage_InfiniteScrolling();
+          }}
+          hasMore={hasMore}
+          loader={<h1>Loading new video...</h1>}
+          endMessage={
+            <p style={{ textAlign: 'center' }}>
+              <b>Yay! You have seen it all</b>
+            </p>
+          }
+        >
+          {videoList.length > 0 &&
+            videoList.map((video) => (
+              <Card key={video._id} type={'undefined'} video={video} />
+            ))}
+        </InfiniteScroll>
       </Box>
 
       <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingVideo_GetList}>
