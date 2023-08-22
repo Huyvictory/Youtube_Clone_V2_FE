@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 const Home = lazy(() => import('@/pages/Home'));
 const Video = lazy(() => import('@/pages/Video'));
 const Profile = lazy(() => import('@/pages/Profile'));
+const ChannelDetail = lazy(() => import('@/pages/ChannelDetail'));
 
 export const appRoutes = [
   {
@@ -26,6 +27,14 @@ export const appRoutes = [
     element: (
       <Suspense fallback={<>Loading...</>}>
         <Video />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/my-channel',
+    element: (
+      <Suspense fallback={<>Loading...</>}>
+        <ChannelDetail />
       </Suspense>
     ),
   },

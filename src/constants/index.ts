@@ -51,6 +51,13 @@ export const profileMenuSettings: Array<{
       cb();
     },
   },
+  {
+    to: '/my-channel',
+    profileMenuName: 'My Channel',
+    onClickHanlder_MenuItem(cb) {
+      cb();
+    },
+  },
 ];
 
 export { toolbarFormatQuill, toolbarQuill };

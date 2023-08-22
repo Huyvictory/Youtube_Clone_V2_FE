@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 
 import Menu from '@/components/Menu';
@@ -16,14 +16,17 @@ const Main = styled.div`
   flex: 7;
   background-color: ${({ theme }) => theme.bg};
 `;
-const Wrapper = styled.div`
-  padding: 22px 96px;
+const Wrapper: any = styled.div`
+  padding: ${({ currentPathLocation }: any) =>
+    currentPathLocation.pathname !== '/my-channel' ? '22px 60px' : '0px 0px'};
 `;
 
 const AppLayout = () => {
   const [darkMode, setDarkMode] = useState(false);
 
   const dispatch = useAppDispatch();
+
+  const location = useLocation();
 
   useEffect(() => {
     dispatch(getUserProfile());
@@ -35,7 +38,7 @@ const AppLayout = () => {
         <Menu darkMode={darkMode} setDarkMode={setDarkMode} />
         <Main>
           <Navbar></Navbar>
-          <Wrapper>
+          <Wrapper currentPathLocation={location}>
             <Outlet />
           </Wrapper>
         </Main>
