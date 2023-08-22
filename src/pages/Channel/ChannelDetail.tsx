@@ -1,14 +1,28 @@
 import { ChevronRightOutlined } from '@mui/icons-material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Avatar, Box, Divider, IconButton, Stack, Tab } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { channelDetail } from '@/contracts/channel';
+import { getChannelDetail } from '@/services/api/channel';
+import { useAppDispatch, useAppSelector } from '@/services/hooks';
+
+import VideosChannel from './VideosChannel';
 
 const ChannelDetail = () => {
-  const [value, setValue] = useState<string>('1');
+  const { channelDetail } = useAppSelector((state) => state.channel);
+
+  const [value, setValue] = useState<string>('Home');
+
+  const dispatch = useAppDispatch();
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+
+  useEffect(() => {
+    dispatch(getChannelDetail());
+  }, []);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -37,11 +51,17 @@ const ChannelDetail = () => {
           }}
         >
           <Box>
-            <Avatar sx={{ objectFit: 'cover', height: '100%', width: '150px' }} />
+            <Avatar
+              src={channelDetail?.channel_owner_id.user_avatar_media_id.media_url}
+              sx={{ objectFit: 'cover', height: '100%', width: '150px' }}
+            />
           </Box>
           <Stack>
-            <p>Minh Huy Võ</p>
-            <span>2 subscribers • 3 videos</span>
+            <p>{channelDetail?.channel_name}</p>
+            <span>
+              {channelDetail?.channel_subscribers.length} subscribers •{' '}
+              {channelDetail?.channel_videos.length} videos
+            </span>
             <span>
               description of channel{' '}
               <IconButton>
@@ -66,8 +86,8 @@ const ChannelDetail = () => {
               }}
             >
               <TabList onChange={handleChange} aria-label="lab API tabs example">
-                <Tab label="Item One" value="1" />
-                <Tab label="Item Two" value="2" />
+                <Tab label="Home" value="Home" />
+                <Tab label="Video" value="Video" />
                 <Tab label="Item Three" value="3" />
               </TabList>
             </Box>
@@ -79,8 +99,10 @@ const ChannelDetail = () => {
               }}
             >
               <Box sx={{ height: '50vh' }}>
-                <TabPanel value="1">Item One</TabPanel>
-                <TabPanel value="2">Item Two</TabPanel>
+                <TabPanel value="Home">Item One</TabPanel>
+                <TabPanel value="Video">
+                  <VideosChannel channelDetail={channelDetail as channelDetail} />
+                </TabPanel>
                 <TabPanel value="3">Item Three</TabPanel>
               </Box>
             </Box>
