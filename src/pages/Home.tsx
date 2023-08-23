@@ -7,13 +7,13 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styled from 'styled-components';
 
 import { getListVideos, getVideoCategories } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
-import { updateNextVideoPage } from '@/services/store/video';
+import { resetVideoList, updateNextVideoPage } from '@/services/store/video';
 
 import Card from '../components/Card';
 
@@ -36,6 +36,8 @@ const Home = () => {
   const [activeVideoCategory, setActiveVideoCategory] = useState<string | null>('');
   const [hasMore, setHasMore] = useState<boolean>(true);
 
+  const previousVideoCategoryRef = useRef(activeVideoCategory);
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -43,6 +45,21 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    if (previousVideoCategoryRef.current !== activeVideoCategory) {
+      previousVideoCategoryRef.current = activeVideoCategory;
+      dispatch(resetVideoList());
+
+      dispatch(
+        getListVideos({
+          page: 1,
+          limit: 12,
+          videoCategory: activeVideoCategory ?? undefined,
+        }),
+      );
+
+      setHasMore(true);
+      return;
+    }
     dispatch(
       getListVideos({
         page: videoPage,
@@ -62,6 +79,7 @@ const Home = () => {
   ) => {
     if (newAlignmentButtonValue !== null) {
       setActiveVideoCategory(newAlignmentButtonValue);
+      dispatch(updateNextVideoPage(1));
     }
   };
 
@@ -94,17 +112,11 @@ const Home = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <InfiniteScroll
           dataLength={videoList.length}
-          height={750}
           next={() => {
             handleNextVideoPage_InfiniteScrolling();
           }}
           hasMore={hasMore}
           loader={<h1>Loading new video...</h1>}
-          endMessage={
-            <p style={{ textAlign: 'center' }}>
-              <b>Yay! You have seen it all</b>
-            </p>
-          }
         >
           {videoList.length > 0 &&
             videoList.map((video) => (
