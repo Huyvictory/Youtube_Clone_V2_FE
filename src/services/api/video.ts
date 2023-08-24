@@ -42,6 +42,27 @@ export const createNewVideo = createAsyncThunk(
   },
 );
 
+export const updateExisingVideo = createAsyncThunk(
+  '/video/update',
+  async ({
+    payload,
+    videoId,
+  }: {
+    payload: any;
+    videoId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.put(
+        `/video/updateVideoDetail/${videoId}`,
+        payload,
+      );
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
 export const getListVideos = createAsyncThunk(
   '/video/list',
   async (payload: {

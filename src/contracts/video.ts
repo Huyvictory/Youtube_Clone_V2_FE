@@ -7,6 +7,8 @@ export type CreateVideoPayload = {
   typeImage: string;
 };
 
+export type UpdateVideoPayload = Partial<CreateVideoPayload>;
+
 export type Video_Categories = {
   _id: string;
   video_category_name: string;
@@ -37,6 +39,10 @@ export type GetVideoByID_Response = {
     channel_name: string;
     channel_subscribers: Array<unknown>;
   };
+  video_thumbnail_media_id: {
+    media_url: string;
+  };
+  video_category_id: string;
   video_title: string;
   video_description: string;
   video_views: number;

@@ -10,7 +10,9 @@ import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import VideosChannel from './VideosChannel';
 
 const ChannelDetail = () => {
-  const { channelDetail } = useAppSelector((state) => state.channel);
+  const { channelDetail, isLoadingGetChannelDetail } = useAppSelector(
+    (state) => state.channel,
+  );
 
   const [value, setValue] = useState<string>('Home');
 
@@ -87,7 +89,7 @@ const ChannelDetail = () => {
             >
               <TabList onChange={handleChange} aria-label="lab API tabs example">
                 <Tab label="Home" value="Home" />
-                <Tab label="Video" value="Video" />
+                <Tab label="Video" value="Video" disabled={isLoadingGetChannelDetail} />
                 <Tab label="Item Three" value="3" />
               </TabList>
             </Box>

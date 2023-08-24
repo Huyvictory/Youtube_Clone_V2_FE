@@ -11,13 +11,14 @@ import {
   getListVideos,
   getVideoByItsId,
   getVideoCategories,
+  updateExisingVideo,
 } from '../api/video';
 
 // Define a type for the slice state
 interface VideoState {
   isLoadingVideo: boolean;
   isLoadingVideo_GetList: boolean;
-  videoCategoriesList?: Array<Video_Categories>;
+  videoCategoriesList: Array<Video_Categories>;
   videoList: Array<GetListVideos_Response>;
   videoDetail?: GetVideoByID_Response;
   videoPage: number;
@@ -27,7 +28,7 @@ interface VideoState {
 const initialState: VideoState = {
   isLoadingVideo: false,
   isLoadingVideo_GetList: false,
-  videoCategoriesList: undefined,
+  videoCategoriesList: [],
   videoList: [],
   videoDetail: undefined,
   videoPage: 1,
@@ -85,6 +86,15 @@ export const videoSlice = createSlice({
       .addCase(getVideoByItsId.fulfilled, (state, action) => {
         state.isLoadingVideo = false;
         state.videoDetail = action.payload.data.data;
+      })
+      .addCase(updateExisingVideo.pending, (state) => {
+        state.isLoadingVideo = true;
+      })
+      .addCase(updateExisingVideo.rejected, (state) => {
+        state.isLoadingVideo = false;
+      })
+      .addCase(updateExisingVideo.fulfilled, (state) => {
+        state.isLoadingVideo = false;
       });
   },
 });
