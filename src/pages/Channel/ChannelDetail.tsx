@@ -1,10 +1,19 @@
 import { ChevronRightOutlined } from '@mui/icons-material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Avatar, Box, Divider, IconButton, Stack, Tab } from '@mui/material';
+import {
+  Avatar,
+  Backdrop,
+  Box,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Stack,
+  Tab,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { channelDetail } from '@/contracts/channel';
 import { getChannelDetail } from '@/services/api/channel';
+import { getListVideos } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 
 import VideosChannel from './VideosChannel';
@@ -13,6 +22,8 @@ const ChannelDetail = () => {
   const { channelDetail, isLoadingGetChannelDetail } = useAppSelector(
     (state) => state.channel,
   );
+
+  const { isLoadingVideo_GetList } = useAppSelector((state) => state.video);
 
   const [value, setValue] = useState<string>('Home');
 
@@ -23,7 +34,17 @@ const ChannelDetail = () => {
   };
 
   useEffect(() => {
-    dispatch(getChannelDetail());
+    dispatch(getChannelDetail()).then((res: any) => {
+      if (res.payload) {
+        dispatch(
+          getListVideos({
+            page: 1,
+            limit: 20,
+            channelId: res.payload.data.data.channelDetail._id,
+          }),
+        );
+      }
+    });
   }, []);
 
   return (
@@ -103,7 +124,7 @@ const ChannelDetail = () => {
               <Box sx={{ height: '50vh' }}>
                 <TabPanel value="Home">Item One</TabPanel>
                 <TabPanel value="Video">
-                  <VideosChannel channelDetail={channelDetail as channelDetail} />
+                  <VideosChannel channelId={channelDetail?._id as string} />
                 </TabPanel>
                 <TabPanel value="3">Item Three</TabPanel>
               </Box>
@@ -111,6 +132,9 @@ const ChannelDetail = () => {
           </TabContext>
         </Box>
       </Box>
+      <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingVideo_GetList}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };

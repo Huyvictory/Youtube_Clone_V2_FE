@@ -1,20 +1,20 @@
 import { Box } from '@mui/material';
-import React from 'react';
 
 import CardVideo_ChannelDetail from '@/components/CardVideo_ChannelDetail';
-import { channelDetail, videosDetailChannel } from '@/contracts/channel';
+import { useAppSelector } from '@/services/hooks';
 
-const VideosChannel = ({ channelDetail }: { channelDetail: channelDetail }) => {
+const VideosChannel = ({ channelId }: { channelId: string }) => {
+  const { videoList } = useAppSelector((state) => state.video);
+
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: '10px 70px' }}>
-      {channelDetail.channel_videos.length > 0 &&
-        channelDetail.channel_videos.map((video: videosDetailChannel, index) => (
+      {videoList.length > 0 &&
+        videoList.map((video) => (
           <CardVideo_ChannelDetail
-            channelDetail={channelDetail}
             key={video._id}
             type={'undefined'}
             video={video}
-            index={index}
+            channelId={channelId}
           />
         ))}
     </Box>

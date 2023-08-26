@@ -25,24 +25,21 @@ import { Controller, useForm } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 
 import { toolbarFormatQuill, toolbarQuill } from '@/constants';
-import { CreateVideoPayload, UpdateVideoPayload } from '@/contracts/video';
-import { getChannelDetail } from '@/services/api/channel';
-import {
-  createNewVideo,
-  getVideoByItsId,
-  getVideoCategories,
-  updateExisingVideo,
-} from '@/services/api/video';
+import { UpdateVideoPayload } from '@/contracts/video';
+import { getListVideos, updateExisingVideo } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
+import { resetVideoList } from '@/services/store/video';
 import { hasSpecifiedFieldError, renderFieldValidation } from '@/utils/formValidation';
 import { showNotification } from '@/utils/notification';
 
 const ModalUpdateVideo = ({
   open,
   setOpen,
+  channelId,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
+  channelId: string;
 }) => {
   const { isLoadingVideo, videoCategoriesList, videoDetail } = useAppSelector(
     (state) => state.video,
@@ -99,7 +96,14 @@ const ModalUpdateVideo = ({
       }),
     ).then((res: any) => {
       if (res.payload) {
-        dispatch(getChannelDetail());
+        dispatch(resetVideoList());
+        dispatch(
+          getListVideos({
+            page: 1,
+            limit: 20,
+            channelId: channelId,
+          }),
+        );
         showNotification('Update Video successfully', 'success', 2000);
         setOpen(false);
       }

@@ -4,9 +4,16 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { channelDetail, videosDetailChannel } from '@/contracts/channel';
-import { getVideoByItsId, getVideoCategories } from '@/services/api/video';
+import { GetListVideos_Response } from '@/contracts/video';
+import {
+  deleteChannelExisitingVideo,
+  getListVideos,
+  getVideoByItsId,
+  getVideoCategories,
+} from '@/services/api/video';
 import { useAppDispatch } from '@/services/hooks';
+import { resetVideoList } from '@/services/store/video';
+import { showNotification } from '@/utils/notification';
 
 import ModalUpdateVideo from './video/ModalUpdateVideo';
 
@@ -63,15 +70,13 @@ const Info = styled.div`
 `;
 
 const CardVideo_ChannelDetail = ({
-  channelDetail,
   type,
   video,
-  index,
+  channelId,
 }: {
-  channelDetail: channelDetail;
   type: any;
-  video: videosDetailChannel;
-  index: number;
+  video: GetListVideos_Response;
+  channelId: string;
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState<boolean>(false);
@@ -93,7 +98,7 @@ const CardVideo_ChannelDetail = ({
   ) => {
     dispatch(getVideoCategories()).then((res: any) => {
       if (res.payload) {
-        dispatch(getVideoByItsId({ videoId: videoId })).then((res: any) => {
+        dispatch(getVideoByItsId({ videoId })).then((res: any) => {
           if (res.payload) {
             setOpen(true);
             setAnchorEl(null);
@@ -105,23 +110,42 @@ const CardVideo_ChannelDetail = ({
     event.preventDefault();
   };
 
+  const hanldeDeleteUserVideo = (
+    event: React.MouseEvent<HTMLLIElement>,
+    videoId: string,
+  ) => {
+    dispatch(deleteChannelExisitingVideo({ videoId })).then((res: any) => {
+      if (res.payload) {
+        dispatch(resetVideoList());
+        dispatch(
+          getListVideos({
+            page: 1,
+            limit: 20,
+            channelId: channelId,
+          }),
+        );
+        showNotification('Update Video successfully', 'success', 2000);
+      }
+    });
+
+    setAnchorEl(null);
+    event.preventDefault();
+  };
+
   return (
     <Box>
       <Link to={`/video/${video._id}`} style={{ textDecoration: 'none' }}>
         <Container type={type}>
-          <Image
-            type={type}
-            src={channelDetail.channel_videos[index].video_thumbnail_media_id.media_url}
-          />
+          <Image type={type} src={video.video_thumbnail_media_id.media_url} />
           <Details type={type}>
             <Box sx={{ display: 'flex' }}>
               <ChannelImage
                 type={type}
-                src={channelDetail.channel_owner_id.user_avatar_media_id.media_url}
+                src={video.user_id.user_avatar_media_id.media_url}
               />
               <Texts>
                 <Title>{video.video_title}</Title>
-                <ChannelName>{channelDetail.channel_name}</ChannelName>
+                <ChannelName>{video.channel_id.channel_name}</ChannelName>
                 <Info>{video.video_views} views • 1 day ago</Info>
               </Texts>
             </Box>
@@ -143,6 +167,7 @@ const CardVideo_ChannelDetail = ({
             horizontal: 'right',
           }}
           open={Boolean(anchorEl)}
+          onClose={handleCloseVideoMenu}
         >
           <MenuItem
             onClick={(e) => {
@@ -151,10 +176,16 @@ const CardVideo_ChannelDetail = ({
           >
             Update
           </MenuItem>
-          <MenuItem onClick={handleCloseVideoMenu}>Delete</MenuItem>
+          <MenuItem
+            onClick={(e) => {
+              hanldeDeleteUserVideo(e, video._id);
+            }}
+          >
+            Delete
+          </MenuItem>
         </Menu>
       </Link>
-      {open && <ModalUpdateVideo open={open} setOpen={setOpen} />}
+      {open && <ModalUpdateVideo open={open} setOpen={setOpen} channelId={channelId} />}
     </Box>
   );
 };

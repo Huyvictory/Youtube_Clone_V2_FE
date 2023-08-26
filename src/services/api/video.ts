@@ -63,12 +63,32 @@ export const updateExisingVideo = createAsyncThunk(
   },
 );
 
+export const deleteChannelExisitingVideo = createAsyncThunk(
+  '/video/delete',
+  async ({
+    videoId,
+  }: {
+    videoId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.delete(
+        `/video/deleteVideoDetail/${videoId}`,
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
 export const getListVideos = createAsyncThunk(
   '/video/list',
   async (payload: {
     page: number;
     limit: number;
     videoCategory?: string;
+    channelId?: string;
   }): Promise<{
     data: { data: Array<GetListVideos_Response> };
   }> => {
@@ -76,6 +96,10 @@ export const getListVideos = createAsyncThunk(
 
     if (payload.videoCategory) {
       urlAPICall += `&videoCategory=${payload.videoCategory}`;
+    }
+
+    if (payload.channelId) {
+      urlAPICall += `&channelId=${payload.channelId}`;
     }
     try {
       const resPromise: {
