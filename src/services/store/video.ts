@@ -6,6 +6,7 @@ import {
   Video_Categories,
 } from '@/contracts/video';
 
+import { UpdateOrCreateChannelBanner } from '../api/channel';
 import {
   createNewVideo,
   getListVideos,

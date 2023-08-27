@@ -12,9 +12,10 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { getChannelDetail } from '@/services/api/channel';
+import { getChannelDetail, UpdateOrCreateChannelBanner } from '@/services/api/channel';
 import { getListVideos } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
+import { showNotification } from '@/utils/notification';
 
 import VideosChannel from './VideosChannel';
 
@@ -24,13 +25,28 @@ const ChannelDetail = () => {
   );
 
   const { isLoadingVideo_GetList } = useAppSelector((state) => state.video);
+  const { isUpdating_ChannelBanner } = useAppSelector((state) => state.channel);
 
   const [value, setValue] = useState<string>('Home');
+  const [previewBannerImage, setPreviewBannerImage] = useState<string>();
 
   const dispatch = useAppDispatch();
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
+  };
+
+  const handleChangeImage = (e: any) => {
+    const formdata = new FormData();
+    formdata.append('file', e.target.files[0]);
+    formdata.append('typeMedia', e.target.files[0].type.split('/')[0]);
+    formdata.append('typeImage', 'CHANNEL_BANNER');
+    dispatch(UpdateOrCreateChannelBanner(formdata)).then((res: any) => {
+      if (res.payload) {
+        setPreviewBannerImage(res.payload.data.data);
+        showNotification('Update channel banner successfully', 'success', 2000);
+      }
+    });
   };
 
   useEffect(() => {
@@ -43,20 +59,41 @@ const ChannelDetail = () => {
             channelId: res.payload.data.data.channelDetail._id,
           }),
         );
+
+        if (res.payload.data.data.channelDetail.channel_banner_media_id) {
+          setPreviewBannerImage(
+            res.payload.data.data.channelDetail.channel_banner_media_id.media_url,
+          );
+        }
       }
     });
   }, []);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      <Box sx={{ width: '100%', height: '30vh' }} component={'div'}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          height: '30vh',
+          mb: 2,
+        }}
+        component={'div'}
+      >
         <img
           src={
-            'https://q5n8c8q9.rocketcdn.me/wp-content/uploads/2019/07/YouTube-Banner-Size-and-Dimensions-Guide.png.webp'
+            previewBannerImage
+              ? previewBannerImage
+              : 'https://q5n8c8q9.rocketcdn.me/wp-content/uploads/2019/07/YouTube-Banner-Size-and-Dimensions-Guide.png.webp'
           }
           alt="channel_banner"
           style={{ objectFit: 'cover', height: '100%', width: '100%' }}
         />
+        <Box sx={{ display: 'flex' }}>
+          <input accept="image/*" type="file" onChange={handleChangeImage} />
+        </Box>
       </Box>
       <Box
         sx={{
@@ -132,7 +169,10 @@ const ChannelDetail = () => {
           </TabContext>
         </Box>
       </Box>
-      <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingVideo_GetList}>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: 100 }}
+        open={isLoadingVideo_GetList || isUpdating_ChannelBanner}
+      >
         <CircularProgress color="inherit" />
       </Backdrop>
     </Box>

@@ -18,3 +18,19 @@ export const getChannelDetail = createAsyncThunk(
     }
   },
 );
+
+export const UpdateOrCreateChannelBanner = createAsyncThunk(
+  '/channel/banner',
+  async (
+    payload: any,
+  ): Promise<{ data: { data: string; message: string; status: number } }> => {
+    try {
+      const resPromise: { data: { data: string; message: string; status: number } } =
+        await axiosHelper.post('/channel/banner', payload);
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);

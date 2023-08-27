@@ -2,17 +2,19 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { channelDetail } from '@/contracts/channel';
 
-import { getChannelDetail } from '../api/channel';
+import { getChannelDetail, UpdateOrCreateChannelBanner } from '../api/channel';
 
 interface ChannelState {
   isLoadingGetChannelDetail: boolean;
   channelDetail?: channelDetail;
+  isUpdating_ChannelBanner: boolean;
 }
 
 // Define the initial state using that type
 const initialState: ChannelState = {
   isLoadingGetChannelDetail: false,
   channelDetail: undefined,
+  isUpdating_ChannelBanner: false,
 };
 
 export const channelSlice = createSlice({
@@ -31,6 +33,15 @@ export const channelSlice = createSlice({
       .addCase(getChannelDetail.fulfilled, (state, action) => {
         state.isLoadingGetChannelDetail = false;
         state.channelDetail = action.payload.data.data.channelDetail;
+      })
+      .addCase(UpdateOrCreateChannelBanner.pending, (state) => {
+        state.isUpdating_ChannelBanner = true;
+      })
+      .addCase(UpdateOrCreateChannelBanner.rejected, (state) => {
+        state.isUpdating_ChannelBanner = false;
+      })
+      .addCase(UpdateOrCreateChannelBanner.fulfilled, (state) => {
+        state.isUpdating_ChannelBanner = false;
       });
   },
 });
