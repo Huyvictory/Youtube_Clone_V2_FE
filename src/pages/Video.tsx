@@ -4,13 +4,19 @@ import ThumbDownOffAltOutlinedIcon from '@mui/icons-material/ThumbDownOffAltOutl
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import { Backdrop, Box, CircularProgress } from '@mui/material';
 import dayjs from 'dayjs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import ReactPlayer from 'react-player';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { getListVideos, getVideoByItsId } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
+import {
+  resetVideoList,
+  resetVideoState,
+  updateNextVideoPage,
+} from '@/services/store/video';
 
 import Card from '../components/Card';
 import Comments from '../components/Comments';
@@ -113,17 +119,23 @@ const Subscribe = styled.button`
 `;
 
 const Video = () => {
-  const { videoList, isLoadingVideo, videoDetail } = useAppSelector(
+  const { videoList, isLoadingVideo, videoDetail, videoPage } = useAppSelector(
     (state) => state.video,
   );
+
+  const [hasMore, setHasMore] = useState(true);
 
   const dispatch = useAppDispatch();
 
   const location = useLocation();
 
   useEffect(() => {
-    dispatch(getListVideos({ page: 1, limit: 10 }));
-  }, []);
+    dispatch(getListVideos({ page: videoPage, limit: 8 })).then((res: any) => {
+      if (res.payload.data.data.length === 0) {
+        setHasMore(false);
+      }
+    });
+  }, [videoPage]);
 
   useEffect(() => {
     dispatch(
@@ -131,6 +143,9 @@ const Video = () => {
         videoId: location.pathname.substring(location.pathname.lastIndexOf('/') + 1),
       }),
     );
+    return () => {
+      dispatch(resetVideoState());
+    };
   }, [location]);
 
   return (
@@ -192,8 +207,19 @@ const Video = () => {
         <Comments />
       </Content>
       <Recommendation>
-        {videoList &&
-          videoList?.map((video) => <Card key={video._id} type={'sm'} video={video} />)}
+        <InfiniteScroll
+          dataLength={videoList.length}
+          next={() => {
+            setTimeout(() => {
+              dispatch(updateNextVideoPage(videoPage + 1));
+            }, 2000);
+          }}
+          hasMore={hasMore}
+          loader={<h1>Loading new video...</h1>}
+        >
+          {videoList &&
+            videoList?.map((video) => <Card key={video._id} type={'sm'} video={video} />)}
+        </InfiniteScroll>
       </Recommendation>
       <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoadingVideo}>
         <CircularProgress color="inherit" />

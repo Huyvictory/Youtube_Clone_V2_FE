@@ -120,7 +120,7 @@ const CardVideo_ChannelDetail = ({
         dispatch(
           getListVideos({
             page: 1,
-            limit: 20,
+            limit: 6,
             channelId: channelId,
           }),
         );

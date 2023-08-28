@@ -3,6 +3,10 @@ import styled from 'styled-components';
 
 import { GetListVideos_Response } from '@/contracts/video';
 
+const VideoLink: any = styled(Link)`
+  width: ${({ type }: any) => type === 'sm' && '100%'};
+`;
+
 const Container: any = styled.div`
   width: ${({ type }: any) => type !== 'sm' && '360px'};
   margin-bottom: ${({ type }: any) => (type === 'sm' ? '10px' : '45px')};
@@ -54,7 +58,7 @@ const Info = styled.div`
 
 const Card = ({ type, video }: { type: any; video: GetListVideos_Response }) => {
   return (
-    <Link to={`/video/${video._id}`} style={{ textDecoration: 'none' }}>
+    <VideoLink type={type} to={`/video/${video._id}`} style={{ textDecoration: 'none' }}>
       <Container type={type}>
         <Image type={type} src={video.video_thumbnail_media_id.media_url} />
         <Details type={type}>
@@ -66,7 +70,7 @@ const Card = ({ type, video }: { type: any; video: GetListVideos_Response }) => 
           </Texts>
         </Details>
       </Container>
-    </Link>
+    </VideoLink>
   );
 };
 

@@ -13,7 +13,11 @@ import styled from 'styled-components';
 
 import { getListVideos, getVideoCategories } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
-import { resetVideoList, updateNextVideoPage } from '@/services/store/video';
+import {
+  resetVideoList,
+  resetVideoState,
+  updateNextVideoPage,
+} from '@/services/store/video';
 
 import Card from '../components/Card';
 
@@ -42,6 +46,10 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(getVideoCategories());
+
+    return () => {
+      dispatch(resetVideoState());
+    };
   }, []);
 
   useEffect(() => {

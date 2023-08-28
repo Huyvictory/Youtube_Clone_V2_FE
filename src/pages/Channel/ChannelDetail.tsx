@@ -17,6 +17,7 @@ import { getListVideos } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { showNotification } from '@/utils/notification';
 
+import HomeChannel from './HomeChannel';
 import VideosChannel from './VideosChannel';
 
 const ChannelDetail = () => {
@@ -24,11 +25,12 @@ const ChannelDetail = () => {
     (state) => state.channel,
   );
 
-  const { isLoadingVideo_GetList } = useAppSelector((state) => state.video);
+  const { isLoadingVideo_GetList, videoPage } = useAppSelector((state) => state.video);
   const { isUpdating_ChannelBanner } = useAppSelector((state) => state.channel);
 
   const [value, setValue] = useState<string>('Home');
   const [previewBannerImage, setPreviewBannerImage] = useState<string>();
+  const [hasMore, setHasMore] = useState(true);
 
   const dispatch = useAppDispatch();
 
@@ -52,14 +54,6 @@ const ChannelDetail = () => {
   useEffect(() => {
     dispatch(getChannelDetail()).then((res: any) => {
       if (res.payload) {
-        dispatch(
-          getListVideos({
-            page: 1,
-            limit: 20,
-            channelId: res.payload.data.data.channelDetail._id,
-          }),
-        );
-
         if (res.payload.data.data.channelDetail.channel_banner_media_id) {
           setPreviewBannerImage(
             res.payload.data.data.channelDetail.channel_banner_media_id.media_url,
@@ -68,6 +62,24 @@ const ChannelDetail = () => {
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (channelDetail) {
+      setTimeout(() => {
+        dispatch(
+          getListVideos({
+            page: videoPage,
+            limit: 6,
+            channelId: channelDetail._id,
+          }),
+        ).then((res: any) => {
+          if (res.payload.data.data.length === 0) {
+            setHasMore(false);
+          }
+        });
+      }, 2000);
+    }
+  }, [channelDetail, videoPage]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -158,10 +170,25 @@ const ChannelDetail = () => {
                 marginX: 'calc((100% - 1284px)/2)',
               }}
             >
-              <Box sx={{ height: '50vh' }}>
-                <TabPanel value="Home">Item One</TabPanel>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '50vh',
+                  width: ' 100%',
+                }}
+              >
+                <TabPanel value="Home">
+                  <HomeChannel
+                    channelId={channelDetail?._id as string}
+                    hasMore={hasMore}
+                  />
+                </TabPanel>
                 <TabPanel value="Video">
-                  <VideosChannel channelId={channelDetail?._id as string} />
+                  <VideosChannel
+                    channelId={channelDetail?._id as string}
+                    hasMore={hasMore}
+                  />
                 </TabPanel>
                 <TabPanel value="3">Item Three</TabPanel>
               </Box>
