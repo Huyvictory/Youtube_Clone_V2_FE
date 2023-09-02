@@ -2,6 +2,7 @@ import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolki
 
 import authReducer from './auth';
 import channelReducer from './channel';
+import playlistReducer from './playlist';
 import userReducer from './user';
 import videoReducer from './video';
 
@@ -10,6 +11,7 @@ export const rootReducer = combineReducers({
   user: userReducer,
   video: videoReducer,
   channel: channelReducer,
+  playlist: playlistReducer,
 });
 
 export const store = configureStore({

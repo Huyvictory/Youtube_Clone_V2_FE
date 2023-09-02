@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { showNotification } from '@/utils/notification';
 
 import HomeChannel from './HomeChannel';
+import PlaylistsChannel from './PlaylistsChannel';
 import VideosChannel from './VideosChannel';
 
 const ChannelDetail = () => {
@@ -160,7 +161,7 @@ const ChannelDetail = () => {
               <TabList onChange={handleChange} aria-label="lab API tabs example">
                 <Tab label="Home" value="Home" />
                 <Tab label="Video" value="Video" disabled={isLoadingGetChannelDetail} />
-                <Tab label="Item Three" value="3" />
+                <Tab label="Playlist" value="Playlist" />
               </TabList>
             </Box>
             <Divider />
@@ -175,7 +176,7 @@ const ChannelDetail = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   height: '50vh',
-                  width: ' 100%',
+                  width: '100%',
                 }}
               >
                 <TabPanel value="Home">
@@ -190,7 +191,9 @@ const ChannelDetail = () => {
                     hasMore={hasMore}
                   />
                 </TabPanel>
-                <TabPanel value="3">Item Three</TabPanel>
+                <TabPanel value="Playlist">
+                  <PlaylistsChannel />
+                </TabPanel>
               </Box>
             </Box>
           </TabContext>

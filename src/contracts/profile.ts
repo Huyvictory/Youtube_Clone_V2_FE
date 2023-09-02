@@ -9,6 +9,7 @@ export interface UserProfile {
   Dob: Date | Dayjs | null;
   sex: string | null;
   user_avatar_media_id: { media_url: string | undefined };
+  channel_id: string;
 }
 
 export type UpdateUserProfile_Payload = Pick<
