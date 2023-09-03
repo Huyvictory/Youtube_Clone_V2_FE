@@ -1,12 +1,24 @@
 import { MoreVertOutlined, PlaylistPlayOutlined } from '@mui/icons-material';
 import { Box, Link, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import { PlaylistDetail } from '@/contracts/playlist';
 
 const PlaylistItem = ({ playlist }: { playlist: PlaylistDetail }) => {
+  const navigate = useNavigate();
+
   return (
     <Box
-      sx={{ display: 'flex', flexDirection: 'column', width: '12vw', marginTop: '2rem' }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '12vw',
+        marginTop: '2rem',
+        cursor: 'pointer',
+      }}
+      onClick={() => {
+        navigate(`/playlist-detail/${playlist._id}`);
+      }}
     >
       <Box sx={{ display: 'flex', height: '15vh', position: 'relative' }}>
         <img

@@ -1,27 +1,41 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { PlaylistDetail } from '@/contracts/playlist';
+import { Playlist_Videos, PlaylistDetail } from '@/contracts/playlist';
 
-import { createNewPlaylist, getListPlaylists_Channel } from '../api/playlist';
+import {
+  createNewPlaylist,
+  getListPlaylists_Channel,
+  getPlaylistDetail,
+} from '../api/playlist';
 
 // Define a type for the slice state
 interface playlistState {
   isLoadingCreatePlaylist: boolean;
   isLoading_GetListPlaylist_channel: boolean;
+  isLoading_GetPlaylistDetail: boolean;
   playlist_data: Array<PlaylistDetail>;
+  playlistDetail?: PlaylistDetail;
+  playlist_videos: Playlist_Videos;
 }
 
 // Define the initial state using that type
 const initialState: playlistState = {
   isLoadingCreatePlaylist: false,
   isLoading_GetListPlaylist_channel: false,
+  isLoading_GetPlaylistDetail: false,
   playlist_data: [],
+  playlistDetail: undefined,
+  playlist_videos: [],
 };
 
 export const playlistSlice = createSlice({
   name: 'playlist',
   initialState,
-  reducers: {},
+  reducers: {
+    updateVideosPlaylist: (state, action) => {
+      state.playlist_videos = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(createNewPlaylist.pending, (state) => {
@@ -42,8 +56,21 @@ export const playlistSlice = createSlice({
       .addCase(getListPlaylists_Channel.fulfilled, (state, action) => {
         state.isLoading_GetListPlaylist_channel = false;
         state.playlist_data = action.payload.data.data;
+      })
+      .addCase(getPlaylistDetail.pending, (state) => {
+        state.isLoading_GetPlaylistDetail = true;
+      })
+      .addCase(getPlaylistDetail.rejected, (state) => {
+        state.isLoading_GetPlaylistDetail = false;
+      })
+      .addCase(getPlaylistDetail.fulfilled, (state, action) => {
+        state.isLoading_GetPlaylistDetail = false;
+        state.playlistDetail = action.payload.data.data;
+        state.playlist_videos = action.payload.data.data.playlist_videos;
       });
   },
 });
+
+export const { updateVideosPlaylist } = playlistSlice.actions;
 
 export default playlistSlice.reducer;

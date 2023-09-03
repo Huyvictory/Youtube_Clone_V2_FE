@@ -46,6 +46,9 @@ export const videoSlice = createSlice({
     resetVideoList: (state) => {
       state.videoList = [];
     },
+    updateVideoList: (state, action) => {
+      state.videoList = action.payload;
+    },
     resetVideoState: () => {
       return initialState;
     },
@@ -105,5 +108,5 @@ export const videoSlice = createSlice({
 
 export default videoSlice.reducer;
 
-export const { updateNextVideoPage, resetVideoList, resetVideoState } =
+export const { updateNextVideoPage, resetVideoList, resetVideoState, updateVideoList } =
   videoSlice.actions;

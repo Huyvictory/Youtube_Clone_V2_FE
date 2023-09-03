@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { getChannelDetail, UpdateOrCreateChannelBanner } from '@/services/api/channel';
 import { getListVideos } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
+import { resetVideoState } from '@/services/store/video';
 import { showNotification } from '@/utils/notification';
 
 import HomeChannel from './HomeChannel';
@@ -62,6 +63,10 @@ const ChannelDetail = () => {
         }
       }
     });
+
+    return () => {
+      dispatch(resetVideoState());
+    };
   }, []);
 
   useEffect(() => {

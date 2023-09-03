@@ -30,6 +30,8 @@ export type GetListVideos_Response = {
       media_url: string;
     };
   };
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type GetVideoByID_Response = {
