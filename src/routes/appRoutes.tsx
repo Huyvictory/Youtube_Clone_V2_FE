@@ -4,6 +4,7 @@ const Home = lazy(() => import('@/pages/Home'));
 const Video = lazy(() => import('@/pages/Video'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const ChannelDetail = lazy(() => import('@/pages/Channel/ChannelDetail'));
+const PlaylistDetail = lazy(() => import('@/pages/Channel/PlaylistDetail'));
 
 export const appRoutes = [
   {
@@ -35,6 +36,14 @@ export const appRoutes = [
     element: (
       <Suspense fallback={<>Loading...</>}>
         <ChannelDetail />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/playlist-detail/:playlistId',
+    element: (
+      <Suspense fallback={<>Loading...</>}>
+        <PlaylistDetail />
       </Suspense>
     ),
   },
