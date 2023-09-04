@@ -83,3 +83,51 @@ export const addOrDeleteVideo_Playlist = createAsyncThunk(
     }
   },
 );
+
+export const updatePlaylistInformation = createAsyncThunk(
+  '/playlist/update/info-playlist',
+  async (payload: {
+    playlist_name?: string;
+    playlist_description?: string;
+    playlistId: string;
+  }): Promise<{
+    message: string;
+    status: number;
+  }> => {
+    try {
+      const resPromise: {
+        message: string;
+        status: number;
+      } = await axiosHelper.put(`/playlist/update/information/${payload.playlistId}`, {
+        playlist_name: payload.playlist_name,
+        playlist_description: payload.playlist_description,
+      });
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const CreateOrUpdatePlaylistRepresentationImage = createAsyncThunk(
+  '/playlist/update-representation',
+  async ({
+    payloadImage,
+    playlistId,
+  }: {
+    payloadImage: any;
+    playlistId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.post(
+        `/playlist/update/representation-image/${playlistId}`,
+        payloadImage,
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);

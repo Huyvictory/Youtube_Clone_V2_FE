@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import ModalCreatePlaylist from '@/components/Playlist/ModalCreatePlaylist';
+import ModalCreatePlaylist from '@/components/Playlist/Modal_Create_Update_PlaylistInformation';
 import PlaylistItem from '@/components/Playlist/PlaylistItem';
 import { getListPlaylists_Channel } from '@/services/api/playlist';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
@@ -43,7 +43,7 @@ const PlaylistsChannel = () => {
             return <PlaylistItem key={playlist._id} playlist={playlist} />;
           })}
       </Box>
-      {open && <ModalCreatePlaylist open={open} setOpen={setOpen} />}
+      {open && <ModalCreatePlaylist open={open} setOpen={setOpen} isUpdating={false} />}
     </Box>
   );
 };

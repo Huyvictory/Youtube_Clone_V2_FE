@@ -5,8 +5,10 @@ import {
   PlayArrowOutlined,
 } from '@mui/icons-material';
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   Divider,
   IconButton,
   List,
@@ -20,8 +22,13 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { useLocation } from 'react-router-dom';
 import tw from 'tailwind-styled-components';
 
+import ModalUpdatePlaylist from '@/components/Playlist/Modal_Create_Update_PlaylistInformation';
 import { Playlist_Videos } from '@/contracts/playlist';
-import { addOrDeleteVideo_Playlist, getPlaylistDetail } from '@/services/api/playlist';
+import {
+  addOrDeleteVideo_Playlist,
+  CreateOrUpdatePlaylistRepresentationImage,
+  getPlaylistDetail,
+} from '@/services/api/playlist';
 import { getListVideos } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { updateVideosPlaylist } from '@/services/store/playlist';
@@ -35,10 +42,13 @@ import { showNotification } from '@/utils/notification';
 dayjs.extend(relativeTime);
 
 const PlaylistDetail = () => {
-  const { playlistDetail, playlist_videos } = useAppSelector((state) => state.playlist);
+  const { playlistDetail, playlist_videos, isLoading_UpdateNewRepresentation } =
+    useAppSelector((state) => state.playlist);
   const { videoList, videoPage } = useAppSelector((state) => state.video);
 
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
+  const [backgroundPlaylistImage, setBackgroundPlaylistImage] = useState<string>();
 
   const location = useLocation();
 
@@ -49,7 +59,13 @@ const PlaylistDetail = () => {
       getPlaylistDetail({
         playlistId: location.pathname.substring(location.pathname.lastIndexOf('/') + 1),
       }),
-    );
+    ).then((res: any) => {
+      if (res.payload) {
+        setBackgroundPlaylistImage(
+          res.payload.data.data.playlist_respresentation_image_id.media_url,
+        );
+      }
+    });
 
     return () => {
       dispatch(resetVideoState());
@@ -126,11 +142,35 @@ const PlaylistDetail = () => {
     e.stopPropagation();
   };
 
-  const SideBarContainer = tw.div`
+  const handleChangeImage = (e: any) => {
+    const formdata = new FormData();
+    formdata.append('file', e.target.files[0]);
+    formdata.append('typeMedia', e.target.files[0].type.split('/')[0]);
+    formdata.append('typeImage', 'PLAYLIST');
+    dispatch(
+      CreateOrUpdatePlaylistRepresentationImage({
+        payloadImage: formdata,
+        playlistId: playlistDetail?._id as string,
+      }),
+    ).then((res: any) => {
+      if (res.payload) {
+        setBackgroundPlaylistImage(res.payload.data.data);
+        dispatch(getPlaylistDetail({ playlistId: playlistDetail?._id as string }));
+        showNotification('Update channel banner successfully', 'success', 2000);
+      }
+    });
+  };
+
+  const SideBarContainer = tw.div<{ $Representation_ImageLink?: string; style: any }>`
     basis-80
     grow-1
     p-4
     relative
+    ${(props) => {
+      if (props.$Representation_ImageLink) {
+        return `text-white`;
+      }
+    }}
     before:content-['']
     before:block
     before:absolute
@@ -138,14 +178,25 @@ const PlaylistDetail = () => {
     before:h-full
     before:top-0
     before:left-0
-    before:bg-[url('https://www.designbombs.com/wp-content/uploads/2023/01/youtube-thumbnail-designs-for-high-ctr.png')]
+    ${(props) => {
+      if (props.$Representation_ImageLink) {
+        return `before:bg-[image:var(--image-url)]`;
+      }
+
+      return `before:bg-[url('https://www.designbombs.com/wp-content/uploads/2023/01/youtube-thumbnail-designs-for-high-ctr.png')]`;
+    }}
     before:bg-no-repeat
     before:blur-sm
     before:bg-cover
   `;
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', position: 'relative' }}>
-      <SideBarContainer id="sidebar">
+      <SideBarContainer
+        id="sidebar"
+        key={backgroundPlaylistImage}
+        style={{ '--image-url': `url(${backgroundPlaylistImage})` }}
+        $Representation_ImageLink={backgroundPlaylistImage}
+      >
         <div className="fixed">
           <div className="flex flex-col w-[288px] h-full gap-y-4">
             <Box sx={{ display: 'flex' }}>
@@ -159,11 +210,18 @@ const PlaylistDetail = () => {
                 className="object-cover w-full h-[175px] rounded-lg z-[200]"
               />
             </Box>
+            <Box sx={{ display: 'flex' }}>
+              <input accept="image/*" type="file" onChange={handleChangeImage} />
+            </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                 {playlistDetail?.playlist_name}
               </Typography>
-              <IconButton>
+              <IconButton
+                onClick={() => {
+                  setOpen(true);
+                }}
+              >
                 <EditOutlined />
               </IconButton>
             </Box>
@@ -304,6 +362,20 @@ const PlaylistDetail = () => {
           </List>
         </Box>
       </div>
+      {open && (
+        <ModalUpdatePlaylist
+          open={open}
+          setOpen={setOpen}
+          isUpdating={true}
+          playlistDetail={playlistDetail}
+        />
+      )}
+      <Backdrop
+        sx={{ color: '#fff', zIndex: 100 }}
+        open={isLoading_UpdateNewRepresentation}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };
