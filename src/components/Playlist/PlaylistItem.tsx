@@ -22,7 +22,11 @@ const PlaylistItem = ({ playlist }: { playlist: PlaylistDetail }) => {
     >
       <Box sx={{ display: 'flex', height: '15vh', position: 'relative' }}>
         <img
-          src="https://www.designbombs.com/wp-content/uploads/2023/01/youtube-thumbnail-designs-for-high-ctr.png"
+          src={
+            playlist.playlist_respresentation_image_id
+              ? playlist.playlist_respresentation_image_id.media_url
+              : 'https://www.designbombs.com/wp-content/uploads/2023/01/youtube-thumbnail-designs-for-high-ctr.png'
+          }
           width={'100%'}
           height={'100%'}
           style={{ objectFit: 'cover' }}

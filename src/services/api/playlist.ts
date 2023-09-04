@@ -131,3 +131,41 @@ export const CreateOrUpdatePlaylistRepresentationImage = createAsyncThunk(
     }
   },
 );
+
+export const deletePlaylist = createAsyncThunk(
+  '/playlist/delete',
+  async ({
+    playlistId,
+  }: {
+    playlistId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.delete(
+        `/playlist/delete/${playlistId}`,
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const updatePlaylistRepresentationImageLink = createAsyncThunk(
+  '/playlist/update/representation-link',
+  async (payload: {
+    media_id: string;
+    media_url: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.put(
+        '/playlist/update/representation-link',
+        { ...payload },
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);

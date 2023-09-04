@@ -6,6 +6,7 @@ export interface PlaylistDetail {
     channel_name: string;
   };
   playlist_respresentation_image_id?: {
+    _id: string;
     media_url: string;
   };
   playlist_description?: string | null;
@@ -23,6 +24,7 @@ export type Playlist_Videos = Array<{
   video_title: string;
   video_views: number;
   video_thumbnail_media_id: {
+    _id: string;
     media_url: string;
   };
   createdAt: string;

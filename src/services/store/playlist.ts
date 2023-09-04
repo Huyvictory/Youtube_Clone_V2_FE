@@ -5,8 +5,10 @@ import { Playlist_Videos, PlaylistDetail } from '@/contracts/playlist';
 import {
   createNewPlaylist,
   CreateOrUpdatePlaylistRepresentationImage,
+  deletePlaylist,
   getListPlaylists_Channel,
   getPlaylistDetail,
+  updatePlaylistRepresentationImageLink,
 } from '../api/playlist';
 
 // Define a type for the slice state
@@ -15,6 +17,7 @@ interface playlistState {
   isLoading_GetListPlaylist_channel: boolean;
   isLoading_GetPlaylistDetail: boolean;
   isLoading_UpdateNewRepresentation: boolean;
+  isLoading: boolean;
   playlist_data: Array<PlaylistDetail>;
   playlistDetail?: PlaylistDetail;
   playlist_videos: Playlist_Videos;
@@ -26,6 +29,7 @@ const initialState: playlistState = {
   isLoading_GetListPlaylist_channel: false,
   isLoading_GetPlaylistDetail: false,
   isLoading_UpdateNewRepresentation: false,
+  isLoading: false,
   playlist_data: [],
   playlistDetail: undefined,
   playlist_videos: [],
@@ -79,6 +83,15 @@ export const playlistSlice = createSlice({
       })
       .addCase(CreateOrUpdatePlaylistRepresentationImage.fulfilled, (state) => {
         state.isLoading_UpdateNewRepresentation = false;
+      })
+      .addCase(deletePlaylist.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deletePlaylist.rejected, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(deletePlaylist.fulfilled, (state) => {
+        state.isLoading = false;
       });
   },
 });

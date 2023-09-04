@@ -2,6 +2,7 @@ import {
   AddOutlined,
   DeleteOutline,
   EditOutlined,
+  MoreVertOutlined,
   PlayArrowOutlined,
 } from '@mui/icons-material';
 import {
@@ -13,6 +14,8 @@ import {
   IconButton,
   List,
   ListItemButton,
+  Menu,
+  MenuItem,
   Typography,
 } from '@mui/material';
 import dayjs from 'dayjs';
@@ -23,11 +26,13 @@ import { useLocation } from 'react-router-dom';
 import tw from 'tailwind-styled-components';
 
 import ModalUpdatePlaylist from '@/components/Playlist/Modal_Create_Update_PlaylistInformation';
+import ModalConfirm_DeletePlaylist from '@/components/Playlist/ModalConfirm_DeletePlaylist';
 import { Playlist_Videos } from '@/contracts/playlist';
 import {
   addOrDeleteVideo_Playlist,
   CreateOrUpdatePlaylistRepresentationImage,
   getPlaylistDetail,
+  updatePlaylistRepresentationImageLink,
 } from '@/services/api/playlist';
 import { getListVideos } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
@@ -42,13 +47,24 @@ import { showNotification } from '@/utils/notification';
 dayjs.extend(relativeTime);
 
 const PlaylistDetail = () => {
-  const { playlistDetail, playlist_videos, isLoading_UpdateNewRepresentation } =
-    useAppSelector((state) => state.playlist);
+  const {
+    playlistDetail,
+    playlist_videos,
+    isLoading_UpdateNewRepresentation,
+    isLoading,
+  } = useAppSelector((state) => state.playlist);
   const { videoList, videoPage } = useAppSelector((state) => state.video);
 
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [open, setOpen] = useState<boolean>(false);
   const [backgroundPlaylistImage, setBackgroundPlaylistImage] = useState<string>();
+  const [openConfirm, setOpenConfirm] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [videoThumbnailDetail, setVideoThumbnailImageDetail] = useState<{
+    media_id: string;
+    media_url: string;
+  }>();
+  const [videoIdToAdd_Delete, setVideoIdToAdd_Delete] = useState<string>();
 
   const location = useLocation();
 
@@ -128,14 +144,18 @@ const PlaylistDetail = () => {
     ).then((res: any) => {
       if (res.payload) {
         showNotification('Delete video playlist successfully !', 'success', 2000);
+        if (
+          !playlist_videos.map((playlist_video) => playlist_video._id).includes(video_id)
+        ) {
+          dispatch(
+            updateVideoList([
+              ...videoList,
+              findAddedorDeletedVideoPlaylist(video_id, res.payload.data.data),
+            ]),
+          );
+        }
         dispatch(
           updateVideosPlaylist(playlist_videos.filter((el) => el._id !== video_id)),
-        );
-        dispatch(
-          updateVideoList([
-            ...videoList,
-            findAddedorDeletedVideoPlaylist(video_id, res.payload.data.data),
-          ]),
         );
       }
     });
@@ -156,9 +176,18 @@ const PlaylistDetail = () => {
       if (res.payload) {
         setBackgroundPlaylistImage(res.payload.data.data);
         dispatch(getPlaylistDetail({ playlistId: playlistDetail?._id as string }));
-        showNotification('Update channel banner successfully', 'success', 2000);
+        showNotification(
+          'Update playlist representaion image successfully',
+          'success',
+          2000,
+        );
       }
     });
+  };
+
+  const handleCloseMenuVideoPlaylist = (event: React.MouseEvent<HTMLLIElement>) => {
+    setAnchorEl(null);
+    event.preventDefault();
   };
 
   const SideBarContainer = tw.div<{ $Representation_ImageLink?: string; style: any }>`
@@ -186,7 +215,7 @@ const PlaylistDetail = () => {
       return `before:bg-[url('https://www.designbombs.com/wp-content/uploads/2023/01/youtube-thumbnail-designs-for-high-ctr.png')]`;
     }}
     before:bg-no-repeat
-    before:blur-sm
+    before:blur-xl
     before:bg-cover
   `;
   return (
@@ -240,15 +269,20 @@ const PlaylistDetail = () => {
               <p>{playlistDetail?.playlist_videos.length} videos</p>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1rem' }}>
-              <Button variant="contained" fullWidth>
-                Play all videos{' '}
+              <button className="w-full bg-blue-600 py-[6px] px-[16px] rounded uppercase font-medium">
+                Play all videos
                 <span>
                   <PlayArrowOutlined />
                 </span>
-              </Button>
-              <Button variant="contained" fullWidth color="error">
+              </button>
+              <button
+                className="w-full bg-red-600 py-[6px] px-[16px] rounded uppercase font-medium"
+                onClick={() => {
+                  setOpenConfirm(true);
+                }}
+              >
                 Delete playlist
-              </Button>
+              </button>
             </Box>
           </div>
         </div>
@@ -292,10 +326,17 @@ const PlaylistDetail = () => {
                   <Box>
                     <IconButton
                       onClick={(e: React.MouseEvent<HTMLElement>) => {
-                        onDeleteVideoPlaylist(e, el._id);
+                        setVideoThumbnailImageDetail({
+                          media_id: playlistDetail?.playlist_respresentation_image_id
+                            ?._id as string,
+                          media_url: el.video_thumbnail_media_id.media_url,
+                        });
+                        setVideoIdToAdd_Delete(el._id);
+                        setAnchorEl(e.currentTarget);
+                        e.preventDefault();
                       }}
                     >
-                      <DeleteOutline />
+                      <MoreVertOutlined />
                     </IconButton>
                   </Box>
                 </ListItemButton>
@@ -370,12 +411,66 @@ const PlaylistDetail = () => {
           playlistDetail={playlistDetail}
         />
       )}
+      {openConfirm && (
+        <ModalConfirm_DeletePlaylist
+          openConfirm={openConfirm}
+          setOpenConfirm={setOpenConfirm}
+          playlistId={playlistDetail?._id as string}
+        />
+      )}
       <Backdrop
         sx={{ color: '#fff', zIndex: 100 }}
-        open={isLoading_UpdateNewRepresentation}
+        open={isLoading_UpdateNewRepresentation || isLoading}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={Boolean(anchorEl)}
+        onClose={handleCloseMenuVideoPlaylist}
+      >
+        <MenuItem
+          onClick={(e: React.MouseEvent<HTMLElement>) => {
+            dispatch(
+              updatePlaylistRepresentationImageLink(
+                videoThumbnailDetail as { media_id: string; media_url: string },
+              ),
+            ).then((res: any) => {
+              if (res.payload) {
+                showNotification(
+                  'Update playlist representaion image link successfully',
+                  'success',
+                  2000,
+                );
+                dispatch(
+                  getPlaylistDetail({ playlistId: playlistDetail?._id as string }),
+                );
+
+                setBackgroundPlaylistImage(res.payload.data.new_media_url);
+              }
+            });
+            setAnchorEl(null);
+          }}
+        >
+          Set this video thumbnail as playlist representation image
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            onDeleteVideoPlaylist(e, videoIdToAdd_Delete as string);
+            setAnchorEl(null);
+          }}
+        >
+          Delete Video
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };

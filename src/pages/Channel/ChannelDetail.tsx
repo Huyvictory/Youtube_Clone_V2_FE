@@ -11,6 +11,7 @@ import {
   Tab,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { getChannelDetail, UpdateOrCreateChannelBanner } from '@/services/api/channel';
 import { getListVideos } from '@/services/api/video';
@@ -30,7 +31,11 @@ const ChannelDetail = () => {
   const { isLoadingVideo_GetList, videoPage } = useAppSelector((state) => state.video);
   const { isUpdating_ChannelBanner } = useAppSelector((state) => state.channel);
 
-  const [value, setValue] = useState<string>('Home');
+  const location = useLocation();
+
+  const [value, setValue] = useState<string>(
+    location.search.substring(location.search.lastIndexOf('=') + 1),
+  );
   const [previewBannerImage, setPreviewBannerImage] = useState<string>();
   const [hasMore, setHasMore] = useState(true);
 
