@@ -1,6 +1,5 @@
 import {
   AddOutlined,
-  DeleteOutline,
   EditOutlined,
   MoreVertOutlined,
   PlayArrowOutlined,
@@ -8,7 +7,6 @@ import {
 import {
   Backdrop,
   Box,
-  Button,
   CircularProgress,
   Divider,
   IconButton,
@@ -22,7 +20,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import tw from 'tailwind-styled-components';
 
 import ModalUpdatePlaylist from '@/components/Playlist/Modal_Create_Update_PlaylistInformation';
@@ -67,6 +65,8 @@ const PlaylistDetail = () => {
   const [videoIdToAdd_Delete, setVideoIdToAdd_Delete] = useState<string>();
 
   const location = useLocation();
+
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
 
@@ -305,6 +305,11 @@ const PlaylistDetail = () => {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%',
+                  }}
+                  onClick={() => {
+                    navigate(
+                      `/playlist-watch/${playlistDetail?._id}?video_index=${index}`,
+                    );
                   }}
                 >
                   <Box sx={{ display: 'flex', columnGap: '1rem' }}>

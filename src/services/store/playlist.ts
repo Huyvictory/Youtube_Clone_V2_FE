@@ -42,6 +42,9 @@ export const playlistSlice = createSlice({
     updateVideosPlaylist: (state, action) => {
       state.playlist_videos = action.payload;
     },
+    resetPlaylistState: () => {
+      return initialState;
+    },
   },
   extraReducers(builder) {
     builder
@@ -96,6 +99,6 @@ export const playlistSlice = createSlice({
   },
 });
 
-export const { updateVideosPlaylist } = playlistSlice.actions;
+export const { updateVideosPlaylist, resetPlaylistState } = playlistSlice.actions;
 
 export default playlistSlice.reducer;

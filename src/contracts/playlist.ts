@@ -20,12 +20,23 @@ export type Playlist_Videos = Array<{
   channel_id: {
     _id: string;
     channel_name: string;
+    channel_subscribers: Array<unknown>;
   };
   video_title: string;
   video_views: number;
   video_thumbnail_media_id: {
     _id: string;
     media_url: string;
+  };
+  video_url: string;
+  video_like_count: string;
+  video_dislike_count: string;
+  user_id: {
+    _id: string;
+    user_avatar_media_id: {
+      _id: string;
+      media_url: string;
+    };
   };
   createdAt: string;
   updatedAt: string;
