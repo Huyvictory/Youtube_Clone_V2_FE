@@ -144,9 +144,8 @@ const PlaylistDetail = () => {
     ).then((res: any) => {
       if (res.payload) {
         showNotification('Delete video playlist successfully !', 'success', 2000);
-        if (
-          !playlist_videos.map((playlist_video) => playlist_video._id).includes(video_id)
-        ) {
+
+        if (!videoList.map((el) => el._id).includes(video_id)) {
           dispatch(
             updateVideoList([
               ...videoList,
@@ -154,6 +153,7 @@ const PlaylistDetail = () => {
             ]),
           );
         }
+
         dispatch(
           updateVideosPlaylist(playlist_videos.filter((el) => el._id !== video_id)),
         );
@@ -215,7 +215,7 @@ const PlaylistDetail = () => {
       return `before:bg-[url('https://www.designbombs.com/wp-content/uploads/2023/01/youtube-thumbnail-designs-for-high-ctr.png')]`;
     }}
     before:bg-no-repeat
-    before:blur-xl
+    before:blur-3xl
     before:bg-cover
   `;
   return (
@@ -338,7 +338,7 @@ const PlaylistDetail = () => {
                         });
                         setVideoIdToAdd_Delete(el._id);
                         setAnchorEl(e.currentTarget);
-                        e.preventDefault();
+                        e.stopPropagation();
                       }}
                     >
                       <MoreVertOutlined />
