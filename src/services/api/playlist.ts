@@ -43,6 +43,37 @@ export const getListPlaylists_Channel = createAsyncThunk(
   },
 );
 
+export const getPlaylistsVideo = createAsyncThunk(
+  '/playlist/playlists/video',
+  async ({
+    video_id,
+  }: {
+    video_id: string;
+  }): Promise<{
+    data: {
+      data: {
+        _id: string;
+        video_playlists: Array<string>;
+      };
+    };
+  }> => {
+    try {
+      const resPromise: {
+        data: {
+          data: {
+            _id: string;
+            video_playlists: Array<string>;
+          };
+        };
+      } = await axiosHelper.get(`/video/getPlaylistsVideo/${video_id}`);
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
 export const getPlaylistDetail = createAsyncThunk(
   '/playlist/detail',
   async ({

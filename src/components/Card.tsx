@@ -1,7 +1,12 @@
+import { MoreVertOutlined } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { GetListVideos_Response } from '@/contracts/video';
+
+import Modal_Add_Video_Playlists from './Playlist/Modal_Add_Video_Playlists';
 
 const VideoLink: any = styled(Link)`
   width: ${({ type }: any) => type === 'sm' && '100%'};
@@ -27,6 +32,7 @@ const Details: any = styled.div`
   margin-top: ${({ type }: any) => type !== 'sm' && '16px'};
   gap: 12px;
   flex: 1;
+  justify-content: space-between;
 `;
 
 const ChannelImage: any = styled.img`
@@ -57,19 +63,40 @@ const Info = styled.div`
 `;
 
 const Card = ({ type, video }: { type: any; video: GetListVideos_Response }) => {
+  const [open, setOpen] = useState<boolean>(false);
+
   return (
     <VideoLink type={type} to={`/video/${video._id}`} style={{ textDecoration: 'none' }}>
       <Container type={type}>
         <Image type={type} src={video.video_thumbnail_media_id.media_url} />
         <Details type={type}>
-          <ChannelImage type={type} src={video.user_id.user_avatar_media_id.media_url} />
-          <Texts>
-            <Title>{video.video_title}</Title>
-            <ChannelName>{video.channel_id.channel_name}</ChannelName>
-            <Info>{video.video_views} views • 1 day ago</Info>
-          </Texts>
+          <div className="flex gap-3">
+            <ChannelImage
+              type={type}
+              src={video.user_id.user_avatar_media_id.media_url}
+            />
+            <Texts>
+              <Title>{video.video_title}</Title>
+              <ChannelName>{video.channel_id.channel_name}</ChannelName>
+              <Info>{video.video_views} views • 1 day ago</Info>
+            </Texts>
+          </div>
+          <div>
+            <IconButton
+              onClick={(e) => {
+                setOpen(true);
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+            >
+              <MoreVertOutlined />
+            </IconButton>
+          </div>
         </Details>
       </Container>
+      {open && (
+        <Modal_Add_Video_Playlists open={open} setOpen={setOpen} videoId={video._id} />
+      )}
     </VideoLink>
   );
 };

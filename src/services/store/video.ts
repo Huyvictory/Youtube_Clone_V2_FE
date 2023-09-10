@@ -6,7 +6,7 @@ import {
   Video_Categories,
 } from '@/contracts/video';
 
-import { UpdateOrCreateChannelBanner } from '../api/channel';
+import { getPlaylistsVideo } from '../api/playlist';
 import {
   createNewVideo,
   getListVideos,
@@ -23,6 +23,7 @@ interface VideoState {
   videoList: Array<GetListVideos_Response>;
   videoDetail?: GetVideoByID_Response;
   videoPage: number;
+  video_playlists: Array<string>;
 }
 
 // Define the initial state using that type
@@ -33,6 +34,7 @@ const initialState: VideoState = {
   videoList: [],
   videoDetail: undefined,
   videoPage: 1,
+  video_playlists: [],
 };
 
 export const videoSlice = createSlice({
@@ -102,6 +104,15 @@ export const videoSlice = createSlice({
       })
       .addCase(updateExisingVideo.fulfilled, (state) => {
         state.isLoadingVideo = false;
+      })
+      .addCase(getPlaylistsVideo.pending, (state) => {
+        state.video_playlists = [];
+      })
+      .addCase(getPlaylistsVideo.rejected, (state) => {
+        state.video_playlists = [];
+      })
+      .addCase(getPlaylistsVideo.fulfilled, (state, action) => {
+        state.video_playlists = action.payload.data.data.video_playlists;
       });
   },
 });
