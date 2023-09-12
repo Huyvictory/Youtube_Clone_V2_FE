@@ -29,6 +29,7 @@ export type Playlist_Videos = Array<{
     media_url: string;
   };
   video_url: string;
+  video_description: string;
   video_like_count: string;
   video_dislike_count: string;
   user_id: {

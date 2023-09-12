@@ -52,7 +52,7 @@ export const profileMenuSettings: Array<{
     },
   },
   {
-    to: '/my-channel',
+    to: '/my-channel?currentTab=Home',
     profileMenuName: 'My Channel',
     onClickHanlder_MenuItem(cb) {
       cb();

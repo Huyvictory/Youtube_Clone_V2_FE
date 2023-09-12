@@ -22,9 +22,12 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Comments from '@/components/Comments';
+import { subscribeChannel, unsubscribeChannel } from '@/services/api/channel';
 import { getPlaylistDetail } from '@/services/api/playlist';
+import { getUserProfile } from '@/services/api/user';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { resetPlaylistState } from '@/services/store/playlist';
+import { showNotification } from '@/utils/notification';
 
 const Container = styled.div`
   display: flex;
@@ -123,6 +126,17 @@ const Subscribe = styled.button`
   cursor: pointer;
 `;
 
+const Unsubscribe = styled.button`
+  background-color: #a6a6a6;
+  font-weight: 500;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  height: max-content;
+  padding: 10px 20px;
+  cursor: pointer;
+`;
+
 const WatchVideosPlaylist = () => {
   const { videoList, isLoadingVideo, videoDetail, videoPage } = useAppSelector(
     (state) => state.video,
@@ -131,13 +145,16 @@ const WatchVideosPlaylist = () => {
   const location = useLocation();
 
   const { playlistDetail } = useAppSelector((state) => state.playlist);
+  const { userPersonalDetail } = useAppSelector((state) => state.user);
 
   const [currentlySelectedVideoPlaylist, setCurrentlySelectedVideoPlaylist] = useState<{
     videoIndex: number;
     video_url: string;
+    video_channel_id: string;
   }>({
     videoIndex: Number(location.search.substring(location.search.lastIndexOf('=') + 1)),
     video_url: '',
+    video_channel_id: '',
   });
 
   const dispatch = useAppDispatch();
@@ -156,6 +173,8 @@ const WatchVideosPlaylist = () => {
           videoIndex: videoIndex,
           video_url: res.payload.data.data.playlist_videos[videoIndex]
             .video_url as string,
+          video_channel_id:
+            res.payload.data.data.playlist_videos[videoIndex].channel_id._id,
         });
       }
     });
@@ -212,12 +231,6 @@ const WatchVideosPlaylist = () => {
             <Button>
               <ThumbDownOffAltOutlined /> Dislike
             </Button>
-            <Button>
-              <ReplyOutlined /> Share
-            </Button>
-            <Button>
-              <AddTaskOutlined /> Save
-            </Button>
           </Buttons>
         </Details>
         <Hr />
@@ -249,13 +262,64 @@ const WatchVideosPlaylist = () => {
               <Description>
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: videoDetail?.video_description as string,
+                    __html: playlistDetail?.playlist_videos[
+                      currentlySelectedVideoPlaylist?.videoIndex as number
+                    ].video_description as string,
                   }}
                 ></div>
               </Description>
             </ChannelDetail>
           </ChannelInfo>
-          <Subscribe>SUBSCRIBE</Subscribe>
+          {userPersonalDetail?.channel_id !==
+            currentlySelectedVideoPlaylist.video_channel_id && (
+            <div>
+              {!userPersonalDetail?.subscribed_channels.includes(
+                currentlySelectedVideoPlaylist.video_channel_id,
+              ) ? (
+                <Subscribe
+                  onClick={() => {
+                    dispatch(
+                      subscribeChannel({
+                        channelId: currentlySelectedVideoPlaylist.video_channel_id,
+                      }),
+                    ).then((res: any) => {
+                      if (res.payload) {
+                        showNotification(
+                          'Subscribed channel successfully',
+                          'success',
+                          2000,
+                        );
+                        dispatch(getUserProfile());
+                      }
+                    });
+                  }}
+                >
+                  SUBSCRIBE
+                </Subscribe>
+              ) : (
+                <Unsubscribe
+                  onClick={() => {
+                    dispatch(
+                      unsubscribeChannel({
+                        channelId: currentlySelectedVideoPlaylist.video_channel_id,
+                      }),
+                    ).then((res: any) => {
+                      if (res.payload) {
+                        showNotification(
+                          'Unsubscribed channel successfully',
+                          'success',
+                          2000,
+                        );
+                        dispatch(getUserProfile());
+                      }
+                    });
+                  }}
+                >
+                  UNSUBSCRIBE
+                </Unsubscribe>
+              )}
+            </div>
+          )}
         </Channel>
         <Hr />
         <Comments />
@@ -287,7 +351,13 @@ const WatchVideosPlaylist = () => {
                 setCurrentlySelectedVideoPlaylist({
                   videoIndex: index,
                   video_url: playlist_video.video_url,
+                  video_channel_id: playlist_video.channel_id._id,
                 });
+                window.history.replaceState(
+                  null,
+                  'Vite + React + TS',
+                  `?video_index=${index}`,
+                );
               }}
             >
               <Box

@@ -43,6 +43,7 @@ const ChannelDetail = () => {
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
+    window.history.replaceState(null, 'Vite + React + TS', `?currentTab=${newValue}`);
   };
 
   const handleChangeImage = (e: any) => {
