@@ -1,5 +1,3 @@
-import AddTaskOutlinedIcon from '@mui/icons-material/AddTaskOutlined';
-import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
 import ThumbDownOffAltOutlinedIcon from '@mui/icons-material/ThumbDownOffAltOutlined';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import { Backdrop, Box, CircularProgress } from '@mui/material';
@@ -10,13 +8,12 @@ import ReactPlayer from 'react-player';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { subscribeChannel, unsubscribeChannel } from '@/services/api/channel';
+import { getUserProfile } from '@/services/api/user';
 import { getListVideos, getVideoByItsId } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
-import {
-  resetVideoList,
-  resetVideoState,
-  updateNextVideoPage,
-} from '@/services/store/video';
+import { resetVideoState, updateNextVideoPage } from '@/services/store/video';
+import { showNotification } from '@/utils/notification';
 
 import Card from '../components/Card';
 import Comments from '../components/Comments';
@@ -118,10 +115,23 @@ const Subscribe = styled.button`
   cursor: pointer;
 `;
 
+const Unsubscribe = styled.button`
+  background-color: #a6a6a6;
+  font-weight: 500;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  height: max-content;
+  padding: 10px 20px;
+  cursor: pointer;
+`;
+
 const Video = () => {
   const { videoList, isLoadingVideo, videoDetail, videoPage } = useAppSelector(
     (state) => state.video,
   );
+
+  const { userPersonalDetail } = useAppSelector((state) => state.user);
 
   const [hasMore, setHasMore] = useState(true);
 
@@ -175,12 +185,6 @@ const Video = () => {
             <Button>
               <ThumbDownOffAltOutlinedIcon /> Dislike
             </Button>
-            <Button>
-              <ReplyOutlinedIcon /> Share
-            </Button>
-            <Button>
-              <AddTaskOutlinedIcon /> Save
-            </Button>
           </Buttons>
         </Details>
         <Hr />
@@ -201,7 +205,55 @@ const Video = () => {
               </Description>
             </ChannelDetail>
           </ChannelInfo>
-          <Subscribe>SUBSCRIBE</Subscribe>
+          {userPersonalDetail?.channel_id !== videoDetail?.channel_id._id && (
+            <div>
+              {!userPersonalDetail?.subscribed_channels.includes(
+                videoDetail?.channel_id._id as string,
+              ) ? (
+                <Subscribe
+                  onClick={() => {
+                    dispatch(
+                      subscribeChannel({
+                        channelId: videoDetail?.channel_id._id as string,
+                      }),
+                    ).then((res: any) => {
+                      if (res.payload) {
+                        showNotification(
+                          'Subscribed channel successfully',
+                          'success',
+                          2000,
+                        );
+                        dispatch(getUserProfile());
+                      }
+                    });
+                  }}
+                >
+                  SUBSCRIBE
+                </Subscribe>
+              ) : (
+                <Unsubscribe
+                  onClick={() => {
+                    dispatch(
+                      unsubscribeChannel({
+                        channelId: videoDetail?.channel_id._id as string,
+                      }),
+                    ).then((res: any) => {
+                      if (res.payload) {
+                        showNotification(
+                          'Unsubscribed channel successfully',
+                          'success',
+                          2000,
+                        );
+                        dispatch(getUserProfile());
+                      }
+                    });
+                  }}
+                >
+                  UNSUBSCRIBE
+                </Unsubscribe>
+              )}
+            </div>
+          )}
         </Channel>
         <Hr />
         <Comments />

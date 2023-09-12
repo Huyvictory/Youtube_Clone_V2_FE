@@ -34,3 +34,43 @@ export const UpdateOrCreateChannelBanner = createAsyncThunk(
     }
   },
 );
+
+export const subscribeChannel = createAsyncThunk(
+  '/channel/subscribe',
+  async ({
+    channelId,
+  }: {
+    channelId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.post(
+        '/channel/subscribe',
+        { channelId },
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject();
+    }
+  },
+);
+
+export const unsubscribeChannel = createAsyncThunk(
+  '/channel/unsubscribe',
+  async ({
+    channelId,
+  }: {
+    channelId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.post(
+        '/channel/unsubscribe',
+        { channelId },
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject();
+    }
+  },
+);

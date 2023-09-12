@@ -10,6 +10,7 @@ export interface UserProfile {
   sex: string | null;
   user_avatar_media_id: { media_url: string | undefined };
   channel_id: string;
+  subscribed_channels: Array<string>;
 }
 
 export type UpdateUserProfile_Payload = Pick<
