@@ -6,10 +6,10 @@ import axiosHelper from '../helper/axiosHelper';
 
 export const getChannelDetail = createAsyncThunk(
   '/channel/details',
-  async (): Promise<GetChannelDetail_Response> => {
+  async ({ channel_id }: { channel_id: string }): Promise<GetChannelDetail_Response> => {
     try {
       const resPromise: GetChannelDetail_Response = await axiosHelper.get(
-        '/channel/details',
+        `/channel/details/${channel_id}`,
       );
 
       return Promise.resolve(resPromise);

@@ -1,8 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { UserProfile } from '@/contracts/profile';
+import { UserSubscribedChannels } from '@/contracts/user';
 
 import {
+  getSubscribedChannels,
   getUserProfile,
   updateUserAvatar,
   updateUserPassword,
@@ -13,12 +15,14 @@ import {
 interface UserState {
   isLoadingUpdateProfile: boolean;
   userPersonalDetail?: UserProfile;
+  subscribedChannels: Array<UserSubscribedChannels>;
 }
 
 // Define the initial state using that type
 const initialState: UserState = {
   isLoadingUpdateProfile: false,
   userPersonalDetail: undefined,
+  subscribedChannels: [],
 };
 
 export const appSlice = createSlice({
@@ -67,6 +71,15 @@ export const appSlice = createSlice({
         state.isLoadingUpdateProfile = false;
         (state.userPersonalDetail as UserProfile).user_avatar_media_id.media_url =
           action.payload.data.data.mediaUrl;
+      })
+      .addCase(getSubscribedChannels.pending, (state, action) => {
+        state.subscribedChannels = [];
+      })
+      .addCase(getSubscribedChannels.rejected, (state) => {
+        state.subscribedChannels = [];
+      })
+      .addCase(getSubscribedChannels.fulfilled, (state, action) => {
+        state.subscribedChannels = action.payload.data.data;
       });
   },
 });

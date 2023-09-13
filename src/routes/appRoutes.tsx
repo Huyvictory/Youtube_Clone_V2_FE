@@ -33,7 +33,7 @@ export const appRoutes = [
     ),
   },
   {
-    path: '/my-channel',
+    path: '/channelDetail/:channelId',
     element: (
       <Suspense fallback={<>Loading...</>}>
         <ChannelDetail />

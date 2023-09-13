@@ -5,6 +5,7 @@ import {
   UpdateUserProfile_Payload,
   UserProfile,
 } from '@/contracts/profile';
+import { UserSubscribedChannels } from '@/contracts/user';
 
 import axiosHelper from '../helper/axiosHelper';
 
@@ -78,6 +79,31 @@ export const updateUserAvatar = createAsyncThunk(
         '/update/user/avatar_profile',
         payload,
       );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const getSubscribedChannels = createAsyncThunk(
+  '/user/subscribed-channels',
+  async ({
+    channelId,
+  }: {
+    channelId: string;
+  }): Promise<{
+    data: { data: Array<UserSubscribedChannels> };
+    message: string;
+    status: number;
+  }> => {
+    try {
+      const resPromise: {
+        data: { data: Array<UserSubscribedChannels> };
+        message: string;
+        status: number;
+      } = await axiosHelper.get(`/user/subscribed-channels/${channelId}`);
 
       return Promise.resolve(resPromise);
     } catch (error) {

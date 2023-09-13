@@ -11,7 +11,7 @@ import {
   Tab,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 
 import { getChannelDetail, UpdateOrCreateChannelBanner } from '@/services/api/channel';
 import { getListVideos } from '@/services/api/video';
@@ -21,6 +21,7 @@ import { showNotification } from '@/utils/notification';
 
 import HomeChannel from './HomeChannel';
 import PlaylistsChannel from './PlaylistsChannel';
+import SubscribedChannel from './SubscribedChannel';
 import VideosChannel from './VideosChannel';
 
 const ChannelDetail = () => {
@@ -32,6 +33,8 @@ const ChannelDetail = () => {
   const { isUpdating_ChannelBanner } = useAppSelector((state) => state.channel);
 
   const location = useLocation();
+
+  const { channelId } = useParams();
 
   const [value, setValue] = useState<string>(
     location.search.substring(location.search.lastIndexOf('=') + 1),
@@ -60,7 +63,7 @@ const ChannelDetail = () => {
   };
 
   useEffect(() => {
-    dispatch(getChannelDetail()).then((res: any) => {
+    dispatch(getChannelDetail({ channel_id: channelId as string })).then((res: any) => {
       if (res.payload) {
         if (res.payload.data.data.channelDetail.channel_banner_media_id) {
           setPreviewBannerImage(
@@ -173,6 +176,7 @@ const ChannelDetail = () => {
                 <Tab label="Home" value="Home" />
                 <Tab label="Video" value="Video" disabled={isLoadingGetChannelDetail} />
                 <Tab label="Playlist" value="Playlist" />
+                <Tab label="Channels" value="Channels" />
               </TabList>
             </Box>
             <Divider />
@@ -204,6 +208,9 @@ const ChannelDetail = () => {
                 </TabPanel>
                 <TabPanel value="Playlist">
                   <PlaylistsChannel />
+                </TabPanel>
+                <TabPanel value="Channels">
+                  <SubscribedChannel />
                 </TabPanel>
               </Box>
             </Box>

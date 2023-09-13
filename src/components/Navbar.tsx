@@ -155,6 +155,26 @@ const Navbar = () => {
                 );
               }
 
+              if (setting.profileMenuName === 'My Channel') {
+                return (
+                  <Link
+                    key={index}
+                    to={`/channelDetail/${userPersonalDetail?.channel_id}?currentTab=Home`}
+                  >
+                    <MenuItem
+                      key={index}
+                      onClick={() => {
+                        setting.onClickHanlder_MenuItem(handleCloseUserMenu);
+                      }}
+                    >
+                      <Typography textAlign="center">
+                        {setting.profileMenuName}
+                      </Typography>
+                    </MenuItem>
+                  </Link>
+                );
+              }
+
               return (
                 <Link key={index} to={setting.to as string}>
                   <MenuItem
