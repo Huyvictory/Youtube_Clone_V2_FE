@@ -44,3 +44,47 @@ export const createCommentVideo = createAsyncThunk(
     }
   },
 );
+
+export const updateCommentVideo = createAsyncThunk(
+  '/comment/update',
+  async ({
+    commentId,
+    comment_content,
+  }: {
+    commentId: string;
+    comment_content: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.put(
+        `/comment/update/${commentId}`,
+        { comment_content },
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const deleteCommentVideo = createAsyncThunk(
+  '/comment/delete',
+  async ({
+    commentId,
+    videoId,
+  }: {
+    commentId: string;
+    videoId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.delete(
+        `/comment/delete/${commentId}`,
+        { data: { videoId: videoId } },
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);

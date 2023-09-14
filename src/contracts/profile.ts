@@ -1,6 +1,7 @@
 import { Dayjs } from 'dayjs';
 
 export interface UserProfile {
+  _id: string;
   email: string | null;
   password: string | null;
   firstname: string | null;

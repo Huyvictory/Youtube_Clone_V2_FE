@@ -121,7 +121,7 @@ const Comments = ({ videoId }: { videoId: string }) => {
       </NewComment>
       {list_comments_video.length > 0 &&
         list_comments_video.map((el) => {
-          return <Comment key={el._id} comment={el} />;
+          return <Comment key={el._id} comment={el} videoId={videoId} />;
         })}
       <Backdrop sx={{ color: '#fff', zIndex: 100 }} open={isLoading}>
         <CircularProgress color="inherit" />
