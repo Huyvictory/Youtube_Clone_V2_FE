@@ -1,5 +1,10 @@
-import React from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import styled from 'styled-components';
+
+import { CommentType } from '@/contracts/comment';
+
+dayjs.extend(relativeTime);
 
 const Container = styled.div`
   display: flex;
@@ -35,19 +40,21 @@ const Text = styled.span`
   font-size: 14px;
 `;
 
-const Comment = () => {
+const Comment = ({ comment }: { comment: CommentType }) => {
   return (
     <Container>
-      <Avatar src="https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo" />
+      <Avatar
+        src={
+          comment.user_avatar_url
+            ? comment.user_avatar_url
+            : 'https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo'
+        }
+      />
       <Details>
         <Name>
-          John Doe <Date>1 day ago</Date>
+          {comment.user_name} <Date>{dayjs(comment.createdAt).fromNow()}</Date>
         </Name>
-        <Text>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Vel, ex laboriosam
-          ipsam aliquam voluptatem perferendis provident modi, sequi tempore reiciendis
-          quod, optio ullam cumque? Quidem numquam sint mollitia totam reiciendis?
-        </Text>
+        <Text>{comment.comment_content}</Text>
       </Details>
     </Container>
   );

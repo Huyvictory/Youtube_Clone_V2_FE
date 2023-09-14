@@ -11,11 +11,12 @@ import {
   Tab,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { getChannelDetail, UpdateOrCreateChannelBanner } from '@/services/api/channel';
 import { getListVideos } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
+import { resetChannelState } from '@/services/store/channel';
 import { resetVideoState } from '@/services/store/video';
 import { showNotification } from '@/utils/notification';
 
@@ -75,6 +76,7 @@ const ChannelDetail = () => {
 
     return () => {
       dispatch(resetVideoState());
+      dispatch(resetChannelState());
     };
   }, []);
 

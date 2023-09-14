@@ -21,7 +21,11 @@ export const channelSlice = createSlice({
   name: 'channel',
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
-  reducers: {},
+  reducers: {
+    resetChannelState: () => {
+      return initialState;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getChannelDetail.pending, (state) => {
@@ -48,4 +52,4 @@ export const channelSlice = createSlice({
 
 export default channelSlice.reducer;
 
-// export const { setAppLoading } = appSlice.actions;
+export const { resetChannelState } = channelSlice.actions;

@@ -322,7 +322,13 @@ const WatchVideosPlaylist = () => {
           )}
         </Channel>
         <Hr />
-        <Comments />
+        <Comments
+          videoId={
+            playlistDetail?.playlist_videos[
+              currentlySelectedVideoPlaylist?.videoIndex as number
+            ]._id as string
+          }
+        />
       </Content>
       <Recommendation>
         <List

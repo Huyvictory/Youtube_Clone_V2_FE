@@ -256,7 +256,9 @@ const Video = () => {
           )}
         </Channel>
         <Hr />
-        <Comments />
+        <Comments
+          videoId={location.pathname.substring(location.pathname.lastIndexOf('/') + 1)}
+        />
       </Content>
       <Recommendation>
         <InfiniteScroll
