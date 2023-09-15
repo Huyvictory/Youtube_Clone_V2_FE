@@ -129,3 +129,47 @@ export const getVideoByItsId = createAsyncThunk(
     }
   },
 );
+
+export const likeVideoId = createAsyncThunk(
+  '/video/like',
+  async ({
+    videoId,
+    userId,
+  }: {
+    videoId: string;
+    userId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.patch(
+        `/video/like/${videoId}`,
+        { userId },
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
+
+export const unlikeVideoId = createAsyncThunk(
+  '/video/unlike',
+  async ({
+    videoId,
+    userId,
+  }: {
+    videoId: string;
+    userId: string;
+  }): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.patch(
+        `/video/unlike/${videoId}`,
+        { userId },
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);

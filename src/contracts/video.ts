@@ -50,8 +50,8 @@ export type GetVideoByID_Response = {
   video_views: number;
   video_url: string;
   video_commments: Array<unknown>;
-  video_like_count: number;
-  video_dislike_count: number;
+  video_like_count: Array<string>;
+  video_dislike_count: Array<string>;
   user_id: {
     user_avatar_media_id: {
       media_url: string;

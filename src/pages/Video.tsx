@@ -1,6 +1,6 @@
-import ThumbDownOffAltOutlinedIcon from '@mui/icons-material/ThumbDownOffAltOutlined';
+import { ThumbDownAlt, ThumbDownOutlined, ThumbUpAlt } from '@mui/icons-material';
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
-import { Backdrop, Box, CircularProgress } from '@mui/material';
+import { Backdrop, Box, CircularProgress, ToggleButton } from '@mui/material';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -10,7 +10,12 @@ import styled from 'styled-components';
 
 import { subscribeChannel, unsubscribeChannel } from '@/services/api/channel';
 import { getUserProfile } from '@/services/api/user';
-import { getListVideos, getVideoByItsId } from '@/services/api/video';
+import {
+  getListVideos,
+  getVideoByItsId,
+  likeVideoId,
+  unlikeVideoId,
+} from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { resetVideoState, updateNextVideoPage } from '@/services/store/video';
 import { showNotification } from '@/utils/notification';
@@ -134,6 +139,9 @@ const Video = () => {
   const { userPersonalDetail } = useAppSelector((state) => state.user);
 
   const [hasMore, setHasMore] = useState(true);
+  const [likeVideoButtonClicked, setLikeVideoButtonClicked] = useState<boolean>(false);
+  const [unlikeVideoButtonClicked, setUnlikeVideoButtonClicked] =
+    useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
@@ -158,6 +166,21 @@ const Video = () => {
     };
   }, [location]);
 
+  useEffect(() => {
+    if (videoDetail) {
+      if (videoDetail?.video_like_count.includes(userPersonalDetail?._id as string)) {
+        setLikeVideoButtonClicked(true);
+      } else {
+        setLikeVideoButtonClicked(false);
+      }
+      if (videoDetail?.video_dislike_count.includes(userPersonalDetail?._id as string)) {
+        setUnlikeVideoButtonClicked(true);
+      } else {
+        setUnlikeVideoButtonClicked(false);
+      }
+    }
+  }, [videoDetail]);
+
   return (
     <Container>
       <Content>
@@ -179,12 +202,74 @@ const Video = () => {
             {dayjs(videoDetail?.createdAt).format('MMM DD, YYYY')}{' '}
           </Info>
           <Buttons>
-            <Button>
-              <ThumbUpOutlinedIcon /> {videoDetail?.video_like_count}
-            </Button>
-            <Button>
-              <ThumbDownOffAltOutlinedIcon /> Dislike
-            </Button>
+            <ToggleButton
+              value="like_video"
+              selected={likeVideoButtonClicked}
+              onChange={() => {
+                setLikeVideoButtonClicked(!likeVideoButtonClicked);
+              }}
+              sx={{ columnGap: '0.5rem' }}
+              onClick={() => {
+                dispatch(
+                  likeVideoId({
+                    videoId: location.pathname.substring(
+                      location.pathname.lastIndexOf('/') + 1,
+                    ),
+                    userId: userPersonalDetail?._id as string,
+                  }),
+                ).then((res: any) => {
+                  if (res.payload) {
+                    dispatch(
+                      getVideoByItsId({
+                        videoId: location.pathname.substring(
+                          location.pathname.lastIndexOf('/') + 1,
+                        ),
+                      }),
+                    );
+                    showNotification('Update like video successfully', 'success', 2000);
+                  }
+                });
+              }}
+            >
+              {likeVideoButtonClicked ? <ThumbUpAlt /> : <ThumbUpOutlinedIcon />}{' '}
+              {videoDetail?.video_like_count.length}
+            </ToggleButton>
+            <ToggleButton
+              value={'unlike_video'}
+              selected={unlikeVideoButtonClicked}
+              sx={{ columnGap: '0.5rem' }}
+              onChange={() => {
+                setUnlikeVideoButtonClicked(!unlikeVideoButtonClicked);
+              }}
+              onClick={() => {
+                dispatch(
+                  unlikeVideoId({
+                    videoId: location.pathname.substring(
+                      location.pathname.lastIndexOf('/') + 1,
+                    ),
+                    userId: userPersonalDetail?._id as string,
+                  }),
+                ).then((res: any) => {
+                  if (res.payload) {
+                    dispatch(
+                      getVideoByItsId({
+                        videoId: location.pathname.substring(
+                          location.pathname.lastIndexOf('/') + 1,
+                        ),
+                      }),
+                    );
+                    showNotification(
+                      'Update dislike video successfully',
+                      'success',
+                      2000,
+                    );
+                  }
+                });
+              }}
+            >
+              {unlikeVideoButtonClicked ? <ThumbDownAlt /> : <ThumbDownOutlined />}{' '}
+              {videoDetail?.video_dislike_count.length}
+            </ToggleButton>
           </Buttons>
         </Details>
         <Hr />
