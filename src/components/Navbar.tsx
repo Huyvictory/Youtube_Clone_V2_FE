@@ -14,7 +14,8 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { profileMenuSettings } from '@/constants';
-import { useAppSelector } from '@/services/hooks';
+import { signOut } from '@/services/api/auth';
+import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { removeLocalStorageKey } from '@/utils/localStorage';
 
 import ModalUploadVideo from './video/ModalUploadVideo';
@@ -81,14 +82,20 @@ const Navbar = () => {
 
   const [open, setOpen] = useState<boolean>(false);
 
+  const dispatch = useAppDispatch();
+
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
   const hanldeLogout = () => {
     setAnchorElUser(null);
-    removeLocalStorageKey('@AUTH_TOKEN_YC');
-    window.location.href = '/';
+    dispatch(signOut()).then((res: any) => {
+      if (res.payload) {
+        removeLocalStorageKey('@AUTH_TOKEN_YC');
+        window.location.href = '/';
+      }
+    });
   };
 
   const handleCloseUserMenu = () => {

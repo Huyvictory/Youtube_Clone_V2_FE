@@ -133,3 +133,18 @@ export const resetNewPassword = createAsyncThunk(
     }
   },
 );
+
+export const signOut = createAsyncThunk(
+  '/auth/sign-out',
+  async (): Promise<{ message: string; status: number }> => {
+    try {
+      const resPromise: { message: string; status: number } = await axiosHelper.get(
+        '/auth/sign-out',
+      );
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);

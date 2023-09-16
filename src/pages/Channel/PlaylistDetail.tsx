@@ -323,8 +323,7 @@ const PlaylistDetail = () => {
                     <div>
                       <p className="font-bold">{el.video_title}</p>
                       <p>
-                        {el.channel_id.channel_name} • {el.video_views} Views •{' '}
-                        {dayjs(el.createdAt).fromNow()}
+                        {el.channel_id.channel_name} • {dayjs(el.createdAt).fromNow()}
                       </p>
                     </div>
                   </Box>
@@ -387,8 +386,7 @@ const PlaylistDetail = () => {
                         <div>
                           <p className="font-bold">{el.video_title}</p>
                           <p>
-                            {el.channel_id.channel_name} • {el.video_views} Views •{' '}
-                            {dayjs(el.createdAt).fromNow()}
+                            {el.channel_id.channel_name} • {dayjs(el.createdAt).fromNow()}
                           </p>
                         </div>
                       </Box>

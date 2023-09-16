@@ -1,5 +1,7 @@
 import { MoreVertOutlined } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -7,6 +9,8 @@ import styled from 'styled-components';
 import { GetListVideos_Response } from '@/contracts/video';
 
 import Modal_Add_Video_Playlists from './Playlist/Modal_Add_Video_Playlists';
+
+dayjs.extend(relativeTime);
 
 const VideoLink: any = styled(Link)`
   width: ${({ type }: any) => type === 'sm' && '100%'};
@@ -78,7 +82,7 @@ const Card = ({ type, video }: { type: any; video: GetListVideos_Response }) => 
             <Texts>
               <Title>{video.video_title}</Title>
               <ChannelName>{video.channel_id.channel_name}</ChannelName>
-              <Info>{video.video_views} views • 1 day ago</Info>
+              <Info>{dayjs(video.createdAt).fromNow()}</Info>
             </Texts>
           </div>
           <div>

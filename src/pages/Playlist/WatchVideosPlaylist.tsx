@@ -1,8 +1,8 @@
 import {
-  AddTaskOutlined,
   MoreVertOutlined,
-  ReplyOutlined,
-  ThumbDownOffAltOutlined,
+  ThumbDownAlt,
+  ThumbDownOutlined,
+  ThumbUpAlt,
   ThumbUpOutlined,
 } from '@mui/icons-material';
 import {
@@ -13,6 +13,7 @@ import {
   List,
   ListItemButton,
   ListSubheader,
+  ToggleButton,
   Typography,
 } from '@mui/material';
 import dayjs from 'dayjs';
@@ -25,6 +26,7 @@ import Comments from '@/components/Comments';
 import { subscribeChannel, unsubscribeChannel } from '@/services/api/channel';
 import { getPlaylistDetail } from '@/services/api/playlist';
 import { getUserProfile } from '@/services/api/user';
+import { likeVideoId, unlikeVideoId } from '@/services/api/video';
 import { useAppDispatch, useAppSelector } from '@/services/hooks';
 import { resetPlaylistState } from '@/services/store/playlist';
 import { showNotification } from '@/utils/notification';
@@ -138,9 +140,7 @@ const Unsubscribe = styled.button`
 `;
 
 const WatchVideosPlaylist = () => {
-  const { videoList, isLoadingVideo, videoDetail, videoPage } = useAppSelector(
-    (state) => state.video,
-  );
+  const { isLoadingVideo } = useAppSelector((state) => state.video);
 
   const location = useLocation();
 
@@ -160,15 +160,23 @@ const WatchVideosPlaylist = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    GetDetailOfPlaylist();
+
+    return () => {
+      dispatch(resetPlaylistState());
+    };
+  }, []);
+
+  const GetDetailOfPlaylist = (index?: number) => {
     dispatch(
       getPlaylistDetail({
         playlistId: location.pathname.substring(location.pathname.lastIndexOf('/') + 1),
       }),
     ).then((res: any) => {
       if (res.payload) {
-        const videoIndex = Number(
-          location.search.substring(location.search.lastIndexOf('=') + 1),
-        );
+        const videoIndex = index
+          ? index
+          : Number(location.search.substring(location.search.lastIndexOf('=') + 1));
         setCurrentlySelectedVideoPlaylist({
           videoIndex: videoIndex,
           video_url: res.payload.data.data.playlist_videos[videoIndex]
@@ -178,11 +186,7 @@ const WatchVideosPlaylist = () => {
         });
       }
     });
-
-    return () => {
-      dispatch(resetPlaylistState());
-    };
-  }, []);
+  };
 
   return (
     <Container>
@@ -207,12 +211,6 @@ const WatchVideosPlaylist = () => {
         </Title>
         <Details>
           <Info>
-            {
-              playlistDetail?.playlist_videos[
-                currentlySelectedVideoPlaylist?.videoIndex as number
-              ].video_views
-            }{' '}
-            views •{' '}
             {dayjs(
               playlistDetail?.playlist_videos[
                 currentlySelectedVideoPlaylist?.videoIndex as number
@@ -220,17 +218,80 @@ const WatchVideosPlaylist = () => {
             ).format('MMM DD, YYYY')}{' '}
           </Info>
           <Buttons>
-            <Button>
-              <ThumbUpOutlined />{' '}
+            <ToggleButton
+              value="like_video"
+              selected={playlistDetail?.playlist_videos[
+                currentlySelectedVideoPlaylist?.videoIndex as number
+              ].video_like_count.includes(userPersonalDetail?._id as string)}
+              sx={{ columnGap: '0.5rem' }}
+              onClick={() => {
+                dispatch(
+                  likeVideoId({
+                    videoId: playlistDetail?.playlist_videos[
+                      currentlySelectedVideoPlaylist?.videoIndex as number
+                    ]._id as string,
+                    userId: userPersonalDetail?._id as string,
+                  }),
+                ).then((res: any) => {
+                  if (res.payload) {
+                    GetDetailOfPlaylist(currentlySelectedVideoPlaylist.videoIndex);
+                    showNotification('Update like video successfully', 'success', 2000);
+                  }
+                });
+              }}
+            >
+              {playlistDetail?.playlist_videos[
+                currentlySelectedVideoPlaylist?.videoIndex as number
+              ].video_like_count.includes(userPersonalDetail?._id as string) ? (
+                <ThumbUpAlt />
+              ) : (
+                <ThumbUpOutlined />
+              )}{' '}
               {
                 playlistDetail?.playlist_videos[
                   currentlySelectedVideoPlaylist?.videoIndex as number
-                ].video_like_count
+                ].video_like_count.length
               }
-            </Button>
-            <Button>
-              <ThumbDownOffAltOutlined /> Dislike
-            </Button>
+            </ToggleButton>
+            <ToggleButton
+              value={'unlike_video'}
+              selected={playlistDetail?.playlist_videos[
+                currentlySelectedVideoPlaylist?.videoIndex as number
+              ].video_dislike_count.includes(userPersonalDetail?._id as string)}
+              sx={{ columnGap: '0.5rem' }}
+              onClick={() => {
+                dispatch(
+                  unlikeVideoId({
+                    videoId: playlistDetail?.playlist_videos[
+                      currentlySelectedVideoPlaylist?.videoIndex as number
+                    ]._id as string,
+                    userId: userPersonalDetail?._id as string,
+                  }),
+                ).then((res: any) => {
+                  if (res.payload) {
+                    GetDetailOfPlaylist(currentlySelectedVideoPlaylist.videoIndex);
+                    showNotification(
+                      'Update dislike video successfully',
+                      'success',
+                      2000,
+                    );
+                  }
+                });
+              }}
+            >
+              {playlistDetail?.playlist_videos[
+                currentlySelectedVideoPlaylist?.videoIndex as number
+              ].video_dislike_count.includes(userPersonalDetail?._id as string) ? (
+                <ThumbDownAlt />
+              ) : (
+                <ThumbDownOutlined />
+              )}{' '}
+              {
+                playlistDetail?.playlist_videos[
+                  currentlySelectedVideoPlaylist?.videoIndex as number
+                ].video_dislike_count.length
+              }
+            </ToggleButton>
           </Buttons>
         </Details>
         <Hr />
