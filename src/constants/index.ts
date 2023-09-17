@@ -5,6 +5,8 @@ export enum AUTH_TOKEN {
   USER_EMAIL = '@USER_EMAIL',
 }
 
+export const IDS_WATCHED_VIDEOS = '@IDS_WATCHED_VIDEOS';
+
 export enum PROFILE_FORMS {
   PROFILE_PICTURE = 'Profile Picture',
   PROFILE_NAME = 'Name',

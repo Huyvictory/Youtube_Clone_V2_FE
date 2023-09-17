@@ -10,6 +10,7 @@ import { getPlaylistsVideo } from '../api/playlist';
 import {
   createNewVideo,
   getListVideos,
+  getListWatchedVideos,
   getVideoByItsId,
   getVideoCategories,
   updateExisingVideo,
@@ -24,6 +25,7 @@ interface VideoState {
   videoDetail?: GetVideoByID_Response;
   videoPage: number;
   video_playlists: Array<string>;
+  video_watched: Array<GetListVideos_Response>;
 }
 
 // Define the initial state using that type
@@ -35,6 +37,7 @@ const initialState: VideoState = {
   videoDetail: undefined,
   videoPage: 1,
   video_playlists: [],
+  video_watched: [],
 };
 
 export const videoSlice = createSlice({
@@ -113,6 +116,16 @@ export const videoSlice = createSlice({
       })
       .addCase(getPlaylistsVideo.fulfilled, (state, action) => {
         state.video_playlists = action.payload.data.data.video_playlists;
+      })
+      .addCase(getListWatchedVideos.pending, (state) => {
+        state.isLoadingVideo_GetList = true;
+      })
+      .addCase(getListWatchedVideos.rejected, (state) => {
+        state.isLoadingVideo_GetList = false;
+      })
+      .addCase(getListWatchedVideos.fulfilled, (state, action) => {
+        state.isLoadingVideo_GetList = false;
+        state.video_watched = action.payload.data.data;
       });
   },
 });

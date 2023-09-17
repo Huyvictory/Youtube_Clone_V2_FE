@@ -14,7 +14,7 @@ import SportsBasketballOutlinedIcon from '@mui/icons-material/SportsBasketballOu
 import SportsEsportsOutlinedIcon from '@mui/icons-material/SportsEsportsOutlined';
 import SubscriptionsOutlinedIcon from '@mui/icons-material/SubscriptionsOutlined';
 import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import LamaTube from '@/assets/logo.png';
@@ -82,13 +82,15 @@ const Title = styled.h2`
 `;
 
 const Menu = ({ darkMode, setDarkMode }: any) => {
+  const navigate = useNavigate();
+
   return (
     <Container>
       <Wrapper>
         <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
           <Logo>
             <Img src={LamaTube} />
-            LamaTube
+            Youtube Clone v2
           </Logo>
         </Link>
         <Item>
@@ -108,7 +110,11 @@ const Menu = ({ darkMode, setDarkMode }: any) => {
           <VideoLibraryOutlinedIcon />
           Library
         </Item>
-        <Item>
+        <Item
+          onClick={() => {
+            navigate('/watched-videos');
+          }}
+        >
           <HistoryOutlinedIcon />
           History
         </Item>

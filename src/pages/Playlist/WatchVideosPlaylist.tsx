@@ -453,11 +453,6 @@ const WatchVideosPlaylist = () => {
                     </Typography>
                   </div>
                 </Box>
-                <Box>
-                  <IconButton>
-                    <MoreVertOutlined />
-                  </IconButton>
-                </Box>
               </Box>
             </ListItemButton>
           ))}

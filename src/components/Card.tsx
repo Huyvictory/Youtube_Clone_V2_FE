@@ -6,7 +6,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { IDS_WATCHED_VIDEOS } from '@/constants';
 import { GetListVideos_Response } from '@/contracts/video';
+import { getLocalStorageKey, setLocalStorageKey } from '@/utils/localStorage';
 
 import Modal_Add_Video_Playlists from './Playlist/Modal_Add_Video_Playlists';
 
@@ -70,7 +72,22 @@ const Card = ({ type, video }: { type: any; video: GetListVideos_Response }) => 
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <VideoLink type={type} to={`/video/${video._id}`} style={{ textDecoration: 'none' }}>
+    <VideoLink
+      type={type}
+      to={`/video/${video._id}`}
+      style={{ textDecoration: 'none' }}
+      onClick={() => {
+        const idsWatchedVideos: Array<string> = JSON.parse(
+          getLocalStorageKey(IDS_WATCHED_VIDEOS) as string,
+        );
+
+        if (!idsWatchedVideos.includes(video._id)) {
+          idsWatchedVideos.push(video._id);
+
+          setLocalStorageKey(IDS_WATCHED_VIDEOS, JSON.stringify(idsWatchedVideos));
+        }
+      }}
+    >
       <Container type={type}>
         <Image type={type} src={video.video_thumbnail_media_id.media_url} />
         <Details type={type}>

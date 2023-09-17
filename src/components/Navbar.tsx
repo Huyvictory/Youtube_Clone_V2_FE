@@ -91,7 +91,7 @@ const Navbar = () => {
   const hanldeLogout = () => {
     setAnchorElUser(null);
     dispatch(signOut()).then((res: any) => {
-      if (res.payload) {
+      if (res.payload || !res.payload) {
         removeLocalStorageKey('@AUTH_TOKEN_YC');
         window.location.href = '/';
       }

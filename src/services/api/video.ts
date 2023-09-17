@@ -173,3 +173,28 @@ export const unlikeVideoId = createAsyncThunk(
     }
   },
 );
+
+export const getListWatchedVideos = createAsyncThunk(
+  '/video/watched',
+  async ({
+    ids_watched_videos,
+  }: {
+    ids_watched_videos: Array<string>;
+  }): Promise<{
+    data: { data: Array<GetListVideos_Response> };
+    message: string;
+    status: number;
+  }> => {
+    try {
+      const resPromise: {
+        data: { data: Array<GetListVideos_Response> };
+        message: string;
+        status: number;
+      } = await axiosHelper.post('/video/watched-videos', { ids_watched_videos });
+
+      return Promise.resolve(resPromise);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+);
